@@ -1,0 +1,98 @@
+{
+  "id": "doc_gn",
+  "idHtml": "libro01gn.html",
+  "titulo": "GÉNESIS",
+  "categoria": "LIBRO",
+  "testamento": "ANTIGUO_TESTAMENTO",
+  "orden": 1,
+  "urlOrigen": "https://www.edesclee.com/content/309-biblia-online-ed?page=libro01gn",
+  "seccionesIntroduccion": [
+    {
+      "id": "sec_intro_1",
+      "idHtml": "intro-gn",
+      "titulosPrevios": [
+        {
+          "id": "tit_intro_1",
+          "idHtml": "h1_intro",
+          "texto": "Introducción al Pentateuco",
+          "nivel": 1,
+          "llamadasNotas": []
+        }
+      ],
+      "parrafos": [
+        {
+          "id": "par_intro_1",
+          "idHtml": "p_intro_1",
+          "texto": "El Pentateuco comprende los cinco primeros libros de la Biblia.",
+          "llamadasNotas": [1]
+        },
+        {
+          "id": "par_intro_2",
+          "idHtml": "p_intro_2",
+          "texto": "Constituye la ley central de la tradición hebrea.",
+          "llamadasNotas": []
+        }
+      ],
+      "llamadasNotas": []
+    }
+  ],
+  "capitulosLibro": [
+    {
+      "id": "cap_1",
+      "idHtml": "cap-1",
+      "numero": 1,
+      "titulosPrevios": [
+        {
+          "id": "tit_cap_1",
+          "idHtml": "h2_cap_1",
+          "texto": "1. LA CREACIÓN DEL MUNDO",
+          "nivel": 2,
+          "llamadasNotas": []
+        }
+      ],
+      "versiculos": [
+        {
+          "id": "ver_1_1",
+          "idHtml": "v011",
+          "numero": 1,
+          "texto": "En el principio creó Dios los cielos y la tierra.",
+          "llamadasNotas": [2]
+        },
+        {
+          "id": "ver_1_2",
+          "idHtml": "v012",
+          "numero": 2,
+          "texto": "La tierra era caos y confusión: oscuridad cubría el abismo, y un viento de Dios aleteaba por encima de las aguas.",
+          "llamadasNotas": [3, 4]
+        }
+      ],
+      "llamadasNotas": []
+    }
+  ],
+  "notasAlPieGlobales": [
+    {
+      "id": 1,
+      "idHtml": "ngn001",
+      "texto": "Nota introductoria sobre el origen de la tradición del Pentateuco.",
+      "referencia": "notas01gn.html#ngn001ref"
+    },
+    {
+      "id": 2,
+      "idHtml": "ngn002",
+      "texto": "El principio abarca la totalidad del tiempo y el cosmos.",
+      "referencia": "notas01gn.html#ngn002ref"
+    },
+    {
+      "id": 3,
+      "idHtml": "ngn003",
+      "texto": "Caos y confusión traduce el término hebreo Tohu va-Vohu.",
+      "referencia": "notas01gn.html#ngn003ref"
+    },
+    {
+      "id": 4,
+      "idHtml": "ngn004",
+      "texto": "El viento de Dios simboliza la fuerza creadora inicial.",
+      "referencia": "notas01gn.html#ngn004ref"
+    }
+  ]
+}

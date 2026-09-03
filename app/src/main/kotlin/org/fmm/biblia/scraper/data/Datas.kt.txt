@@ -1,0 +1,77 @@
+package org.fmm.biblia.scraper.data
+
+import kotlinx.serialization.Serializable
+
+// === ENTIDAD PRINCIPAL DEL DOCUMENTO ===
+
+@Serializable
+enum class TipoTestamento { ANTIGUO, NUEVO, OTRO }
+
+@Serializable
+enum class CategoriaContenido { LIBRO_BIBLICO, INTRODUCCION_BLOQUE, ANEXO }
+
+@Serializable
+data class DocumentoBiblico(
+    val id: String,                     // Ej: "libro01gn", "bloque01penta"
+    val titulo: String,                 // Ej: "GÉNESIS", "Introducción al Pentateuco"
+    val categoria: CategoriaContenido,
+    val testamento: TipoTestamento = TipoTestamento.OTRO,
+    val orden: Int,                     // Posición en el índice
+    val urlOrigen: String,
+    val notasPie: List<NotaPie> = emptyList(),
+    val bloques: List<BloqueContenido> = emptyList() // Secuencia ordenada del contenido
+)
+
+// === NOTAS Y LLAMADAS ===
+
+@Serializable
+data class NotaPie(
+    val id: String,                     // Ej: "n1", "a"
+    val referenciaVersiculo: String? = null, // Ej: "1,1"
+    val texto: String                   // Contenido aclaratorio o teológico
+)
+
+// === JERARQUÍA DE BLOQUES DE CONTENIDO ===
+
+@Serializable
+sealed interface BloqueContenido
+
+// Títulos y subtítulos contextuales
+@Serializable
+data class TituloSeccion(
+    val nivel: Int,                     // 1 para Sección Principal, 2 para Perícopa/Subtítulo
+    val texto: String,                  // Ej: "I. LA CREACIÓN DEL MUNDO", "Llamamiento de Moisés"
+    val paralelos: List<String> = emptyList() // Ej: ["Mt 3,13-17", "Mc 1,9-11"]
+) : BloqueContenido
+
+// Párrafos informativos (típicos de introducciones y apéndices)
+@Serializable
+data class ParrafoTexto(
+    val texto: String
+) : BloqueContenido
+
+// Estructura propia de los libros bíblicos
+@Serializable
+data class ContenedorCapitulo(
+    val numero: Int,
+    val elementos: List<ElementoCapitulo> = emptyList()
+) : BloqueContenido
+
+// === ELEMENTOS INTERNOS DE UN CAPÍTULO ===
+
+@Serializable
+sealed interface ElementoCapitulo
+
+@Serializable
+data class SubtituloCapitulo(
+    val texto: String,
+    val paralelos: List<String> = emptyList()
+) : ElementoCapitulo
+
+@Serializable
+data class Versiculo(
+    val numero: Int,
+    val texto: String,
+    val esPoesia: Boolean = false,      // Permite respetar sangrías de cánticos/salmos
+    val llamadasNotas: List<String> = emptyList() // IDs de las NotaPie asociadas
+) : ElementoCapitulo

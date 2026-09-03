@@ -1,0 +1,89 @@
+package org.fmm.biblia.scraper.data
+
+import kotlinx.serialization.Serializable
+
+// === BASE TRANSVERSAL DE CONTENIDO ===
+
+/**
+ * Representa cualquier nodo de contenido susceptible de tener ID o llamadas a notas.
+ */
+sealed interface Contenido {
+    val id: String?
+    val llamadasNotas: List<String>
+}
+
+// === NODOS HOJA (TEXTO / ELEMENTOS) ===
+
+@Serializable
+data class Titulo(
+    override val id: String? = null,
+    val nivel: Int,
+    val texto: String,
+    val paralelos: List<String> = emptyList(),
+    override val llamadasNotas: List<String> = emptyList()
+) : Contenido
+
+@Serializable
+data class Parrafo(
+    override val id: String? = null,
+    val texto: String,
+    override val llamadasNotas: List<String> = emptyList()
+) : Contenido
+
+@Serializable
+data class Versiculo(
+    override val id: String? = null,
+    val numero: Int,
+    val texto: String,
+    val esPoesia: Boolean = false,
+    val paralelos: List<String> = emptyList(),
+    val titulosPrevios: List<Titulo> = emptyList(),
+    override val llamadasNotas: List<String> = emptyList()
+) : Contenido
+
+// === CONTENEDORES CON TÍTULOS PREVIOS ===
+
+sealed interface ContenedorBloque {
+    val titulosPrevios: List<Titulo>
+}
+
+@Serializable
+data class Capitulo(
+    val numero: Int,
+    override val titulosPrevios: List<Titulo> = emptyList(),
+    val versiculos: List<Versiculo> = emptyList()
+) : ContenedorBloque
+
+@Serializable
+data class SeccionIntroduccion(
+    override val titulosPrevios: List<Titulo> = emptyList(),
+    val parrafos: List<Parrafo> = emptyList()
+) : ContenedorBloque
+
+// === MODELO GLOBAL ===
+
+@Serializable
+enum class TipoTestamento { ANTIGUO, NUEVO, OTRO }
+
+@Serializable
+enum class CategoriaDocumento { LIBRO_BIBLICO, INTRODUCCION, APENDICE }
+
+@Serializable
+data class NotaAlPie(
+    val id: String,
+    val texto: String,
+    val referencia: String? = null
+)
+
+@Serializable
+data class DocumentoBiblico(
+    val id: String,
+    val titulo: String,
+    val categoria: CategoriaDocumento,
+    val testamento: TipoTestamento = TipoTestamento.OTRO,
+    val orden: Int,
+    val urlOrigen: String,
+    val seccionesIntroduccion: List<SeccionIntroduccion> = emptyList(),
+    val capitulosLibro: List<Capitulo> = emptyList(),
+    val notasAlPieGlobales: List<NotaAlPie> = emptyList()
+)

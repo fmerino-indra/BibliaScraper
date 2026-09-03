@@ -1,0 +1,25 @@
+{
+  "id": "bloque01penta",
+  "titulo": "Introducción al Pentateuco",
+  "categoria": "INTRODUCCION_BLOQUE",
+  "testamento": "ANTIGUO",
+  "orden": 1,
+  "urlOrigen": "https://www.edesclee.com/content/bloque01penta.html",
+  "notasPie": [],
+  "bloques": [
+    {
+      "type": "TituloSeccion",
+      "nivel": 1,
+      "texto": "EL PENTATEUCO Y SUS FUENTES",
+      "paralelos": []
+    },
+    {
+      "type": "ParrafoTexto",
+      "texto": "Los cinco primeros libros de la Biblia forman en la tradición judía un grupo compacto llamado la Torah o la Ley..."
+    },
+    {
+      "type": "ParrafoTexto",
+      "texto": "Su composición es el resultado de una larga tradición oral y escrita donde se entrelazan la tradición Yavista, Elohísta, Deuteronomista y Sacerdotal."
+    }
+  ]
+}

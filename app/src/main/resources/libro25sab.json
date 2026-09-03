@@ -1,0 +1,54 @@
+{
+  "id": "libro25sab",
+  "titulo": "SABIDURÍA",
+  "categoria": "LIBRO_BIBLICO",
+  "testamento": "ANTIGUO",
+  "orden": 25,
+  "urlOrigen": "https://www.edesclee.com/content/libro25sab.html",
+  "notasPie": [
+    {
+      "id": "a",
+      "referenciaVersiculo": "1,1",
+      "texto": "La Sabiduría es presentada como un regalo divino y una guía moral para los gobernantes de la tierra."
+    }
+  ],
+  "bloques": [
+    {
+      "type": "TituloSeccion",
+      "nivel": 1,
+      "texto": "I. LA SABIDURÍA Y EL DESTINO DEL HOMBRE",
+      "paralelos": []
+    },
+    {
+      "type": "TituloSeccion",
+      "nivel": 2,
+      "texto": "Buscar a Dios y huir del pecado",
+      "paralelos": [
+        "Pr 1,7",
+        "Eclo 1,1-10"
+      ]
+    },
+    {
+      "type": "ContenedorCapitulo",
+      "numero": 1,
+      "elementos": [
+        {
+          "type": "Versiculo",
+          "numero": 1,
+          "texto": "Amad la justicia, los que juzgáis la tierra, pensad rectamente del Señor y buscadle con sencillez de corazón.",
+          "esPoesia": true,
+          "llamadasNotas": [
+            "a"
+          ]
+        },
+        {
+          "type": "Versiculo",
+          "numero": 2,
+          "texto": "Porque se deja hallar de los que no le tientan, y se manifiesta a los que no le desconfían.",
+          "esPoesia": true,
+          "llamadasNotas": []
+        }
+      ]
+    }
+  ]
+}
