@@ -352,9 +352,34 @@ object BibliaScraper {
             }
 
             // [FMMP] Creo que no es necesario que sea recursivo, porque el procesamiento ya detectará las notas
-            for (hijo in nodo.childNodes()) {
-                extraerNotasDeNodo(hijo, capitulo, bufferNotas)
+//            for (hijo in nodo.childNodes()) {
+//                extraerNotasDeNodo(hijo, capitulo, bufferNotas)
+//            }
+        }
+    }
+
+    /**
+     * Helper unificado para extraer paralelos en cualquier nodo DOM
+     */
+    private fun extraerParalelosDeNodo(
+        nodo: org.jsoup.nodes.Node,
+        capitulo: Int,
+        bufferParalelos: MutableList<Paralelo>
+    ) {
+        if (nodo is Element) {
+            val tag = nodo.tagName().lowercase()
+
+            // # <href...> -> Contenedor de pasajes paralelos. Referencia a pasaje paralelo
+            if (tag.startsWith("href")) {
+                val ref = nodo.attr("href")
+                    .ifEmpty { tag.substringAfter("href=").replace("\"", "").trim() }
+                bufferParalelos.registrarNota(ref, ref)
             }
+
+            // [FMMP] Creo que no es necesario que sea recursivo, porque el procesamiento ya detectará las notas
+//            for (hijo in nodo.childNodes()) {
+//                extraerParaleloDeNodo(hijo, capitulo, bufferNotas)
+//            }
         }
     }
 }

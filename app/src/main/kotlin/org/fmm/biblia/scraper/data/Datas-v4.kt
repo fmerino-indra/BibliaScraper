@@ -16,13 +16,20 @@ sealed interface ContenedorBloque : Contenido {
 }
 
 @Serializable
+sealed interface Paralelizable {
+    val paralelos: List<Paralelo>
+
+}
+
+@Serializable
 data class Titulo(
     override val id: String,
     override val idHtml: String? = null,
     val texto: String,
     val nivel: Int = 1,
-    override val llamadasNotas: List<NotaAlPie> = emptyList(),
-) : Contenido
+    override val llamadasNotas: List<NotaAlPie> = mutableListOf(),
+    override val paralelos: List<Paralelo> = mutableListOf()
+) : Contenido, Paralelizable
 
 @Serializable
 data class Parrafo(
@@ -39,8 +46,8 @@ data class Versiculo(
     val numero: Int,
     val texto: String,
     override val llamadasNotas: List<NotaAlPie> = mutableListOf(),
-    val paralelos: List<Paralelo> = emptyList()
-) : Contenido
+    override val paralelos: List<Paralelo> = mutableListOf()
+) : Contenido, Paralelizable
 
 @Serializable
 data class Capitulo(
@@ -49,7 +56,7 @@ data class Capitulo(
     val numero: Int,
     override val titulosPrevios: List<Titulo> = emptyList(),
     val versiculos: List<Versiculo> = emptyList(),
-    override val llamadasNotas: List<NotaAlPie> = emptyList(),
+    override val llamadasNotas: List<NotaAlPie> = mutableListOf(),
 ) : ContenedorBloque
 
 @Serializable
@@ -58,7 +65,7 @@ data class SeccionIntroduccion(
     override val idHtml: String? = null,
     override val titulosPrevios: List<Titulo> = emptyList(),
     val parrafos: List<Parrafo> = emptyList(),
-    override val llamadasNotas: List<NotaAlPie> = emptyList(),
+    override val llamadasNotas: List<NotaAlPie> = mutableListOf(),
 ) : ContenedorBloque
 
 @Serializable
@@ -81,6 +88,21 @@ fun MutableList<NotaAlPie>.registrarNota(idHtml:String, href: String, capitulo: 
 fun MutableList<NotaAlPie>.vincularA(contenido: Contenido) {
     if (isNotEmpty()) {
         (contenido.llamadasNotas as? MutableList<NotaAlPie>)?.addAll(this.distinctBy { it.href })
+
+        clear() // Se vacía el buffer local para el siguiente bloque
+    }
+}
+
+// 2. Funciones de extensión sobre la lista de paralelos del ámbito del parser
+fun MutableList<Paralelo>.registrarNota(cita:String, destino: String) {
+    if (cita.isNotBlank()) {
+        add(Paralelo(cita=cita, destino=destino))
+    }
+}
+
+fun MutableList<Paralelo>.vincularA(contenido: Paralelizable) {
+    if (isNotEmpty()) {
+        (contenido.paralelos as? MutableList<Paralelo>)?.addAll(this.distinctBy { it.cita })
 
         clear() // Se vacía el buffer local para el siguiente bloque
     }
