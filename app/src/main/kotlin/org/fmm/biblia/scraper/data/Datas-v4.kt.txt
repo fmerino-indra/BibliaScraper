@@ -94,7 +94,7 @@ fun MutableList<NotaAlPie>.vincularA(contenido: Contenido) {
 }
 
 // 2. Funciones de extensión sobre la lista de paralelos del ámbito del parser
-fun MutableList<Paralelo>.registrarNota(cita:String, destino: String) {
+fun MutableList<Paralelo>.registrarParalelo(cita:String, destino: String) {
     if (cita.isNotBlank()) {
         add(Paralelo(cita=cita, destino=destino))
     }

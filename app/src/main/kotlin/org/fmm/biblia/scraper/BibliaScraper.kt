@@ -3,50 +3,39 @@ package org.fmm.biblia.scraper
 import org.fmm.biblia.scraper.data.Capitulo
 import org.fmm.biblia.scraper.data.CategoriaDocumento
 import org.fmm.biblia.scraper.data.DocumentoBiblico
+import org.fmm.biblia.scraper.data.IElementoVersiculo
 import org.fmm.biblia.scraper.data.NotaAlPie
 import org.fmm.biblia.scraper.data.Paralelo
 import org.fmm.biblia.scraper.data.SeccionIntroduccion
+import org.fmm.biblia.scraper.data.TextoPlano
 import org.fmm.biblia.scraper.data.Titulo
 import org.fmm.biblia.scraper.data.Versiculo
 import org.fmm.biblia.scraper.data.registrarNota
+import org.fmm.biblia.scraper.data.registrarParalelo
 import org.fmm.biblia.scraper.data.vincularA
+import org.fmm.biblia.scraper.data.addListIElementVersiculoToVersiculo
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 
 object BibliaScraper {
 
     // 1. Sanitizador para limpiar el HTML malformado antes de que Jsoup cree el DOM
-    private fun sanitizarHtmlV01(rawHtml: String): String {
-        return rawHtml
-            // Convierte etiquetas corruptas <href="..."> en <a href="...">
-            .replace(Regex("""<href=([^>]+)>""", RegexOption.IGNORE_CASE), "<a href=$1>")
-            .replace(Regex("""</href>""", RegexOption.IGNORE_CASE), "</a>")
-    }
-
-    private fun sanitizarHtmlV02(rawHtml: String): String {
-        return rawHtml
-            // Sustituye cualquier etiqueta de apertura <href="...
-            .replace(Regex("""<href=""", RegexOption.IGNORE_CASE), "<a href=")
-            // Sustituye los cierres </href...
-            .replace(Regex("""</href[^>]*>""", RegexOption.IGNORE_CASE), "</a>")
-    }
-
     private fun sanitizarHtml(rawHtml: String): String {
         return rawHtml
-            // Sustituye <href ...> y </href> por <span data-type="href" ...> y </span>
-            .replace(Regex("""<href(\s+[^>]*)?>""", RegexOption.IGNORE_CASE), "<span data-type=\"href\"$1>")
-            .replace(Regex("""</href>""", RegexOption.IGNORE_CASE), "</span>")
-            // Sustituye <id ...> y </id> por <span data-type="id" ...> y </span>
-            .replace(Regex("""<id(\s+[^>]*)?>""", RegexOption.IGNORE_CASE), "<span data-type=\"id\"$1>")
-            .replace(Regex("""</id>""", RegexOption.IGNORE_CASE), "</span>")
+//            .replace(Regex("""<href(\s+[^>]*)?>""", RegexOption.IGNORE_CASE), "<span data-type=\"href\"$1>")
+//            .replace(Regex("""</href>""", RegexOption.IGNORE_CASE), "</span>")
+//            .replace(Regex("""<id(\s+[^>]*)?>""", RegexOption.IGNORE_CASE), "<span data-type=\"id\"$1>")
+//            .replace(Regex("""</id>""", RegexOption.IGNORE_CASE), "</span>")
     }
+
     // 2. Descarga y limpia la página objetivo
     fun descargarYLimpiar(url: String): Document {
         val respuesta = Jsoup.connect(url)
             .userAgent("Mozilla/5.0 (X11; Fedora; Linux x86_64)")
-            .timeout(10_000)
+            .timeout(100_000)
             .execute()
 
         val htmlSanitizado = sanitizarHtml(respuesta.body())
@@ -60,20 +49,10 @@ object BibliaScraper {
         urlTexto: String,
         urlNotas: String? = null
     ): DocumentoBiblico {
-        /*
-        // A) Extraer notas globales primero si existen
-        val notasGlobales = urlNotas?.let { parsearNotas(it) } ?: emptyList()
-        val mapaNotasHtmlAId = notasGlobales.mapNotNull { nota ->
-            nota.idHtml?.let { it to nota.id }
-        }.toMap()
 
-         */
-
-        // B) Descargar y parsear el documento principal
+        // A) Descargar y parsear el documento principal
         val docHtml = descargarYLimpiar(urlTexto)
 
-//        val seccionesIntro = parsearSeccionesIntroduccion(docHtml, mapaNotasHtmlAId)
-//        val capitulos = parsearCapitulos(docHtml, mapaNotasHtmlAId)
         val seccionesIntro = parsearSeccionesIntroduccion(docHtml)
         val capitulos = parsearCapitulosDesdeArea(docHtml)
 
@@ -85,14 +64,7 @@ object BibliaScraper {
             urlOrigen = urlTexto,
             seccionesIntroduccion = seccionesIntro,
             capitulosLibro = capitulos,
-//            notasAlPieGlobales = notasGlobales
         )
-    }
-
-    private fun parsearNotas(urlNotas: String): List<NotaAlPie> {
-        val docNotas = descargarYLimpiar(urlNotas)
-        // Lógica de extracción de div/p de notas asociándoles un ID entero autoincremental
-        return emptyList()
     }
 
     private fun parsearSeccionesIntroduccion(doc: Document): List<SeccionIntroduccion> {
@@ -100,7 +72,8 @@ object BibliaScraper {
         return emptyList()
     }
 
-    private fun parsearCapitulosDesdeArea(doc: Document): List<Capitulo> {
+//    fun parsearCapitulosDesdeArea(doc: Document): List<Capitulo> {
+    fun parsearCapitulosDesdeArea(doc: Element): List<Capitulo> {
         val areaContenido = doc.selectFirst("div.ddbEbookContent") ?: return emptyList()
         val capitulos = mutableListOf<Capitulo>()
 
@@ -116,43 +89,30 @@ object BibliaScraper {
             val elem = elementos[i]
 
             when {
-                // Títulos y encabezados
+                // #<hX>: Títulos (Pueden contener paralelos y notas en cualquier orden; no versículos)
                 elem.tagName() in listOf("h1", "h2", "h3", "h4") -> {
-                    val nivel = when (elem.tagName()) {
-                        "h1" -> 1
-                        "h2" -> 2
-                        "h3" -> 3
-                        else -> 4
-                    }
-
-                    // Buffer de notas exclusivo para el título actual
-                    val notasTitulo = mutableListOf<NotaAlPie>()
-
-                    // Extraemos texto y capturamos posibles notas en <span data-type="id"> dentro del título
-                    for (nodoHijo in elem.childNodes()) {
-                        extraerNotasDeNodo(nodoHijo, numCapituloActual, notasTitulo)
-                    }
-
-                    val nuevoTitulo = Titulo(
-                        id = "tit_${numCapituloActual}_${titulosPendientes.size + 1}",
-                        texto = elem.text().trim(),
-                        nivel = nivel
-                    )
-
-                    // Vinculamos las notas capturadas al objeto Titulo
-                    notasTitulo.vincularA(nuevoTitulo)
-
-                    titulosPendientes.add(nuevoTitulo)
+                    val nivel = elem.tagName().removePrefix("h").toIntOrNull() ?: 1
+                    val titulo = parsearEncabezado(elem, numCapituloActual, titulosPendientes.size + 1, nivel)
+                    titulosPendientes.add(titulo)
                 }
 
-                // Párrafos de texto
+                // #<p>: Párrafos de texto (Pueden contener cambio de capítulo, versículos, notas y paralelos)
                 elem.tagName() == "p" && (elem.hasClass("ddb6") || elem.hasClass("noindent")) -> {
-                    // DETECCIÓN DE CAPÍTULO POR span.capital1
+
+                    // ## Detección de cambio de capítulo por <span class="capital1">
                     val spanCapital = elem.selectFirst("span.capital1")
                     if (spanCapital != null) {
                         val numCapDetectado = spanCapital.text().replace(Regex("[^0-9]"), "").toIntOrNull()
+
+                        // [FMMP] Me pasé de listo, crea el capítulo anterior
+                        // cuando encuentra uno nuevo
+                        /*
                         if (numCapDetectado != null) {
-                            // Guardar capítulo anterior si ya había contenido
+                            numCapituloActual = numCapDetectado
+                        }
+
+                         */
+                        if (numCapDetectado != null) {
                             if (versiculosActuales.isNotEmpty()) {
                                 capitulos.add(
                                     Capitulo(
@@ -169,27 +129,41 @@ object BibliaScraper {
                         }
                     }
 
-                    val versiculosDelParrafo = extraerVersiculosDeElemento(elem, numCapituloActual)
+                    val versiculosDelParrafo = extraerVersiculosDeElemento(elem, numCapituloActual, titulosPendientes)
 
+                    // [FMMP] Versículos huérfanos, significa que la segunda parte de un versículo está en párrafo aparte.
                     for (v in versiculosDelParrafo) {
                         if (v.numero == -1) {
-                            // Si es continuación de un párrafo anterior, ensamblamos el texto al último versículo guardado
                             if (versiculosActuales.isNotEmpty()) {
-                                val ultimo = versiculosActuales.removeAt(versiculosActuales.size - 1)
-                                val textoCombinado = "${ultimo.texto} ${v.texto}".replace(Regex("\\s+"), " ")
-                                val notasCombinadas = (ultimo.llamadasNotas + v.llamadasNotas).distinct()
-
-                                versiculosActuales.add(ultimo.copy(texto = textoCombinado, llamadasNotas = notasCombinadas))
+                                val ultimo = versiculosActuales.last()
+                                //[FMMP] Coger el último y añadirle un <BR>
+                                ultimo.addParagraph()
+                                ultimo.contenido.addListIElementVersiculoToVersiculo(v.contenido)
+                                ultimo.paralelos.addAll(v.paralelos)
                             }
                         } else {
                             versiculosActuales.add(v)
                         }
                     }
+                    if (versiculosActuales.isNotEmpty()) {
+                        // [FMMP] Al último versículo le añadimos un salto
+                        val ultimo = versiculosActuales.last()
+                        ultimo.addParagraph()
+                    } else {
+                        println("[FMMP]")
+                    }
+                } // <p>
+                else -> { // un <div>, por ejemplo
+                    for (nodoHijo in elem.childNodes()) {
+                        if (nodoHijo is Element) {
+                            parsearCapitulosDesdeArea(nodoHijo)
+                        }
+                    }
                 }
-            }
-        }
+            } //when
 
-        // Guardar el último capítulo procesado
+        } // for
+        // Ultimo capítulo
         if (versiculosActuales.isNotEmpty()) {
             capitulos.add(
                 Capitulo(
@@ -205,181 +179,258 @@ object BibliaScraper {
     }
 
     /**
-     * Extraer Versiculos
+     * Procesa etiquetas <hX> extrayendo de forma agnóstica al orden sus notas y paralelos.
      */
-    private fun extraerVersiculosDeElemento(
-        parrafo: Element,
-        numCapitulo: Int,
-    ): List<Versiculo> {
+    private fun parsearEncabezado(elem: Element, numCapitulo: Int, orden: Int, nivel: Int): Titulo {
+        val notas = mutableListOf<NotaAlPie>()
+        val paralelos = mutableListOf<Paralelo>()
+        val textoTitulo = StringBuilder()
+
+        fun recorrerNodo(nodo: Node) {
+            when (nodo) {
+                is Element -> {
+                    val tag = nodo.tagName().lowercase()
+                    if (isTagParalelo(nodo, tag)) {
+                        extraerYRegistrarParalelo(nodo, tag, numCapitulo, paralelos)
+                    }
+                    if (isTagNota(nodo, tag)) {
+                        extraerYRegistrarNota(nodo,tag, numCapitulo, notas)
+                    }
+                    for (hijo in nodo.childNodes()) {
+                        recorrerNodo(hijo)
+                    }
+                }
+                is TextNode -> {
+                    val t = nodo.text()
+                    if (t.isNotBlank()) textoTitulo.append(t)
+                }
+            }
+        }
+
+        recorrerNodo(elem)
+
+        return Titulo(
+            id = "tit_${numCapitulo}_$orden",
+            texto = textoTitulo.toString().trim().replace(Regex("\\s+"), " "),
+            nivel = nivel,
+            llamadasNotas = notas.distinctBy { it.href }.toMutableList(),
+            paralelos = paralelos.distinctBy { it.cita }.toMutableList(),
+        )
+    }
+
+    /**
+     * Recorre linealmente las entrañas del <p>, extrayendo versículos a medida que los encuentra
+     * en el árbol anidado de notas y paralelos.
+     */
+    private fun extraerVersiculosDeElemento(parrafo: Element, numCapitulo: Int, titulosPrevios: MutableList<Titulo>): List<Versiculo> {
         val resultado = mutableListOf<Versiculo>()
 
         var idHtmlVerActual = ""
         var numVerActual = -1
         val textoVerActual = StringBuilder()
-        val notasVerActual = mutableListOf<Int>()
+        val textoVerLista = mutableListOf<IElementoVersiculo>()
         val paralelosVerActual = mutableListOf<Paralelo>()
         val notasPendientes = mutableListOf<NotaAlPie>()
 
-        // Cierra el versículo activo en el acumulador y lo añade a la lista
+        var versiculoHuerfano=false
+
         fun consolidarVersiculo() {
             if (numVerActual != -1) {
-                val textoLimpio = textoVerActual.toString()
-                    .trim()
-                    .replace(Regex("\\s+"), " ")
-                val nuevoVersiculo =
-                    Versiculo(
-                        id = "ver_${numCapitulo}_$numVerActual",
-                        idHtml = idHtmlVerActual,
-                        numero = numVerActual,
-                        texto = textoLimpio,
-                        paralelos = paralelosVerActual.distinct()
-                    )
+                val textoLimpio = textoVerActual.toString().trim().replace(Regex("\\s+"), " ")
+                val nuevoVersiculo = Versiculo(
+                    id = "ver_${numCapitulo}_$numVerActual",
+                    idHtml = idHtmlVerActual,
+                    capitulo = numCapitulo,
+                    numero = numVerActual,
+//                    contenido = textoVerLista.distinct().toMutableList(),
+                    paralelos = paralelosVerActual.distinct().toMutableList(),
+//                    titulosPrevios = titulosPrevios.distinct()
+                )
+                nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(titulosPrevios)
+                nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(textoVerLista)
+
+
+                titulosPrevios.clear()
                 notasPendientes.vincularA(nuevoVersiculo)
                 resultado.add(nuevoVersiculo)
 
                 textoVerActual.clear()
-                notasVerActual.clear()
+                textoVerLista.clear()
                 paralelosVerActual.clear()
                 numVerActual = -1
+            } else {
+                // Este caso es que exista un fragmento que no se ha asignado a un versículo ya creado en párrafo anterior.
+                // Puede arrastrar títulos, etc.
+                // Por aquí pasa cuando es el primer versículo de un párrafo.
+                //println("[FMMP] ${Thread.currentThread().stackTrace[1].methodName} Capítulo: $numCapitulo | Texto: $textoLimpio ")
             }
         }
 
-        // Inspecciona recursivamente cada nodo del párrafo en orden secuencial
-        fun procesarNodoInterno(nodo: org.jsoup.nodes.Node) {
+        fun consolidarVersiculoHuerfano() {
+
+            if (versiculoHuerfano) {
+                println("[FMMP] ${Thread.currentThread().stackTrace[1].methodName} Capítulo: $numCapitulo | Texto: $textoVerLista | Paralelos: $paralelosVerActual | Notas: $notasPendientes | versiculoHuerfano: $versiculoHuerfano")
+                //addTextoPlanoVersiculo(textoVerLista, textoLimpio)
+                val nuevoVersiculo = Versiculo(
+                    id = "ver_${numCapitulo}_$numVerActual",
+                    idHtml = idHtmlVerActual,
+                    capitulo = numCapitulo,
+                    numero = numVerActual,
+//                    contenido = textoVerLista.distinct().toMutableList(),
+                    paralelos = paralelosVerActual.distinct().toMutableList()
+                )
+                nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(titulosPrevios)
+                nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(textoVerLista)
+                titulosPrevios.clear()
+
+                notasPendientes.vincularA(nuevoVersiculo)
+                resultado.add(nuevoVersiculo)
+
+                textoVerActual.clear()
+                textoVerLista.clear()
+                paralelosVerActual.clear()
+                numVerActual = -1
+                versiculoHuerfano = false
+
+            }
+        }
+
+        fun procesarNodoInterno(nodo: Node) {
             when (nodo) {
                 is Element -> {
                     val tag = nodo.tagName().lowercase()
 
                     when {
-                        // # <sup> -> Marca de número de versículo
+                        // Número de versículo: punto de corte y consolidación
                         tag == "sup" && nodo.id().startsWith("v") -> {
+                            if (textoVerLista.isNotEmpty() && numVerActual == -1) {
+                                //println("[FMMP] ${Thread.currentThread().stackTrace[1].methodName} Capítulo: $numCapitulo | Texto: SPM")
+                                versiculoHuerfano=true
+                                consolidarVersiculoHuerfano()
+                            }
                             consolidarVersiculo()
                             idHtmlVerActual = nodo.id()
-                            numVerActual = nodo.text().replace(Regex("[^0-9]"), "").toIntOrNull() ?: 0
+                            numVerActual = nodo.text().replace(Regex("[^0-9]"), "").toIntOrNull() ?: -1
                             return
                         }
 
-                        // # <id...> -> Contenedor o referencia a Nota al Pie
-                        tag.startsWith("id") -> {
-                            val hrefAttr = nodo.attr("href").ifEmpty {
-                                tag.substringAfter("href=\"", "").substringBefore("\"")
-                            }
-                            // Extrae la referencia del href o del id propio del nodo malformado
-                            val target = nodo.attr("href").substringAfter("#", "")
-                                .ifEmpty { nodo.id() }
-                                .ifEmpty { tag.removePrefix("id") } // Por si el parser pegó el id al nombre de la etiqueta
-                                .ifEmpty { tag.substringAfter("id=").replace("\"", "").trim()}
-
-                            notasPendientes.registrarNota(idHtml = target, href = hrefAttr, capitulo = numCapitulo)
+                        // Detección de Nota al pie
+                        isTagNota(nodo, tag) -> {
+                            extraerYRegistrarNota(nodo, tag, numCapitulo, notasPendientes)
+                                ?.let { elemento -> textoVerLista.add(elemento) } // el nombre por defecto es it
                         }
 
-                        // # <href...> -> Contenedor de pasajes paralelos. Referencia a pasaje paralelo
-                        tag.startsWith("href") -> {
-                            val ref = nodo.attr("href")
-                                .ifEmpty { tag.substringAfter("href=").replace("\"", "").trim() }
-                            val paraleloRef=Paralelo(
-                                cita = ref,
-                                destino = ref,
-                            )
+                        // Detección de Paralelo
+                        isTagParalelo(nodo, tag) -> {
+                            val ref = nodo.attr("href").ifEmpty {
+                                tag.substringAfter("href=").replace("\"", "").trim()
+                            }
                             if (ref.isNotBlank()) {
-                                paralelosVerActual.add(paraleloRef)
-                            }
-                        }
-
-                        // # <i> -> Formato cursiva o notas directas
-                        tag == "i" -> {
-                            // Si contiene una referencia a nota interna
-                            val target = nodo.attr("href").substringAfter("#", "").ifEmpty { nodo.id() }
-                            if (target.isNotEmpty()) {
+                                paralelosVerActual.add(Paralelo(cita = ref, destino = ref))
                             }
                         }
                     }
 
-                    // Recorrer nodos hijos para extraer el texto y/o subetiquetas
                     for (hijo in nodo.childNodes()) {
                         procesarNodoInterno(hijo)
                     }
                 }
 
                 is TextNode -> {
-                    // # Texto -> Se añade al versículo que esté activo en este momento
                     val texto = nodo.text()
-                    if (texto.isNotBlank() && numVerActual != -1) {
-                        textoVerActual.append(texto)
+                    val textoLimpio = texto.trim().replace(Regex("\\s+"), " ")
+
+                    // Ignora el contenido del <span class="capital1"> para no contaminar el texto del versículo
+                    val parent = nodo.parent() as? Element
+                    val esSpanCapital = parent?.tagName() == "span" && parent.hasClass("capital1")
+
+//                    if (!esSpanCapital && texto.isNotBlank() && numVerActual != -1) {
+                    if (!esSpanCapital && texto.isNotBlank()) {
+                        if (numVerActual == -1) {
+
+//                            println("[FMMP] ${Thread.currentThread().stackTrace[1].methodName} Capítulo: $numCapitulo | Texto: $textoLimpio  ")
+//                            versiculoHuerfano=true
+//                            consolidarVersiculoHuerfano(textoLimpio)
+                        }
+                        textoVerActual.append(textoLimpio)
+                        addTextoPlanoVersiculo(textoVerLista, textoLimpio)
+                        //textoVerLista.add(TextoPlano(textoLimpio))
                     }
                 }
             }
         }
 
-        // Recorrido de los nodos directamente contenidos en el <p>
         for (nodoHijo in parrafo.childNodes()) {
             procesarNodoInterno(nodoHijo)
         }
 
-        // Guardar el último versículo hallado en el párrafo
         consolidarVersiculo()
 
-        // Añadir marca [BR] al último versículo extraído para indicar fin de párrafo
+        //[FMMP] Añade fin de párrafo al último fragmento del último versículo
+        /* Para después
         if (resultado.isNotEmpty()) {
             val ultimo = resultado.last()
             resultado[resultado.size - 1] = ultimo.copy(texto = "${ultimo.texto} [BR]")
         }
-
+        */
         return resultado
     }
 
-    /**
-     * Helper unificado para extraer notas en cualquier nodo DOM
-     */
-    private fun extraerNotasDeNodo(
-        nodo: org.jsoup.nodes.Node,
-        capitulo: Int,
-        bufferNotas: MutableList<NotaAlPie>
-    ) {
-        if (nodo is Element) {
-            val tag = nodo.tagName().lowercase()
+    private fun addTextoPlanoVersiculo(textoVerLista: MutableList<IElementoVersiculo>, textoLimpio: String) {
+        if (textoLimpio.isBlank() || textoLimpio == "*")
+            return
+        val ultimo = textoVerLista.lastOrNull()
+        if (ultimo is TextoPlano) {
+            val indiceUltimo = textoVerLista.lastIndex
 
-            // Tras sanitizarHtml, las notas están en etiquetas <span> con data-type="id" o que inicien por "id"
-            if (tag.startsWith("id") || (tag == "span" && nodo.attr("data-type") == "id")) {
-                val hrefAttr = nodo.attr("href").ifEmpty {
-                    nodo.outerHtml().substringAfter("href=\"", "").substringBefore("\"")
-                }
-                val target = hrefAttr.substringAfter("#", "")
-                    .ifEmpty { nodo.id() }
-                    .ifEmpty { tag.removePrefix("id") }
+            // 1. Tomamos el primer carácter del texto que va a entrar
+            val primerCaracter = textoLimpio.first()
+            // 2. Definimos los signos que NO llevan espacio antes (puedes añadir más si quieres)
+            val signosSinEspacioPrevio = setOf('.', ',', ';', ':', '?', '!', ')', ']', '»')
+            // 3. Decidimos el conector: si es un signo, nada ""; si es palabra, un espacio " "
+            val conector = if (primerCaracter in signosSinEspacioPrevio) "" else " "
 
-                bufferNotas.registrarNota(idHtml = target, href = hrefAttr, capitulo = capitulo)
-            }
+            // 4. Reemplazamos el último elemento con los textos combinados
+            textoVerLista[indiceUltimo]=TextoPlano(ultimo.texto + conector + textoLimpio)
 
-            // [FMMP] Creo que no es necesario que sea recursivo, porque el procesamiento ya detectará las notas
-//            for (hijo in nodo.childNodes()) {
-//                extraerNotasDeNodo(hijo, capitulo, bufferNotas)
-//            }
+        } else {
+            textoVerLista.add(TextoPlano(textoLimpio))
         }
+
+    }
+
+    private fun isTagNota(elem: Element, tag: String): Boolean {
+        return tag.startsWith("id") || (tag == "span" && elem.attr("data-type") == "id")
+    }
+
+    private fun isTagParalelo(elem: Element, tag: String): Boolean {
+        return tag.startsWith("href") || (tag == "span" && elem.attr("data-type") == "href")
+    }
+
+    private fun extraerYRegistrarNota(elem: Element, tag: String, capitulo: Int, buffer: MutableList<NotaAlPie>): NotaAlPie? {
+        val hrefAttr = elem.attr("href").ifEmpty {
+            elem.outerHtml().substringAfter("href=\"", "").substringBefore("\"")
+        }
+        val target = hrefAttr.substringAfter("#", "")
+            .ifEmpty { elem.id() }
+            .ifEmpty { tag.removePrefix("id") }
+        return buffer.registrarNota(idHtml = target, href = hrefAttr, capitulo = capitulo)
     }
 
     /**
      * Helper unificado para extraer paralelos en cualquier nodo DOM
+     * <href="m01gn.html#m2"
      */
-    private fun extraerParalelosDeNodo(
-        nodo: org.jsoup.nodes.Node,
-        capitulo: Int,
-        bufferParalelos: MutableList<Paralelo>
+    private fun extraerYRegistrarParalelo(nodo: Node, tag: String, capitulo: Int, buffer: MutableList<Paralelo>
     ) {
         if (nodo is Element) {
-            val tag = nodo.tagName().lowercase()
-
-            // # <href...> -> Contenedor de pasajes paralelos. Referencia a pasaje paralelo
+            // <href="m01gn.html#m2" ...> -> Contenedor de pasajes paralelos. Referencia a pasaje paralelo
             if (tag.startsWith("href")) {
                 val ref = nodo.attr("href")
                     .ifEmpty { tag.substringAfter("href=").replace("\"", "").trim() }
-                bufferParalelos.registrarNota(ref, ref)
+                buffer.registrarParalelo(ref, ref)
             }
-
-            // [FMMP] Creo que no es necesario que sea recursivo, porque el procesamiento ya detectará las notas
-//            for (hijo in nodo.childNodes()) {
-//                extraerParaleloDeNodo(hijo, capitulo, bufferNotas)
-//            }
         }
     }
+
 }

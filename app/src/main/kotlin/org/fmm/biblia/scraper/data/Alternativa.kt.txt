@@ -1,0 +1,137 @@
+package org.fmm.biblia.scraper.data
+
+// ==========================================
+// 1. INTERFACES Y MODELOS SOPORTE
+// ==========================================
+
+data class NotaAlPie(
+    val idHtml: String,
+    val href: String,
+    val capitulo: Int,
+    val texto: String = ""
+)
+
+data class Paralelo(
+    val cita: String,
+    val destino: String, // es más o menos lo mismo que url, solo que
+    val url: String? = null
+)
+
+interface Contenido {
+    val llamadasNotas: MutableList<NotaAlPie>
+}
+
+interface Paralelizable {
+    val paralelos: List<Paralelo>
+}
+
+/**
+ * Marca cualquier elemento estructural o de contenido que pueda formar
+ * parte del flujo del texto dentro de un capítulo.
+ */
+sealed interface BloqueContenido
+
+// ==========================================
+// 2. ELEMENTOS DE CONTENIDO MÍNIMOS
+// ==========================================
+
+data class Titulo(
+    val texto: String,
+    val clave: String? = null,
+    override val llamadasNotas: MutableList<NotaAlPie> = mutableListOf(),
+    override val paralelos: MutableList<Paralelo> = mutableListOf()
+) : Contenido, Paralelizable, BloqueContenido
+
+data class SeccionIntroduccion(
+    val htmlPre: String,
+    override val llamadasNotas: MutableList<NotaAlPie> = mutableListOf()
+) : Contenido, BloqueContenido
+
+data class Versiculo(
+    val numero: Int,
+    val texto: String,
+    override val llamadasNotas: MutableList<NotaAlPie> = mutableListOf(),
+    override val paralelos: MutableList<Paralelo> = mutableListOf()
+) : Contenido, Paralelizable
+
+data class VersoPoetico(
+    val texto: String,
+    val numeroVersiculoReferencia: Int? = null, // Asocia la línea poética con su versículo bíblico
+    val sangria: Int = 0,                       // Nivel de sangría/sangrado del verso
+    override val llamadasNotas: MutableList<NotaAlPie> = mutableListOf(),
+    override val paralelos: MutableList<Paralelo> = mutableListOf()
+) : Contenido, Paralelizable
+
+// ==========================================
+// 3. ESTRUCTURAS DE AGRUPACIÓN (PROSA / POESÍA)
+// ==========================================
+
+/**
+ * Agrupación de elementos en prosa (pueden contener versículos enteros, fragmentos o títulos).
+ */
+data class Parrafo(
+    val elementos: List<Contenido>
+) : BloqueContenido
+
+/**
+ * Agrupación de versos poéticos.
+ */
+data class Estrofa(
+    val versos: List<VersoPoetico>
+) : BloqueContenido
+
+// ==========================================
+// 4. ESTRUCTURA CANÓNICA (LIBRO Y CAPÍTULO)
+// ==========================================
+
+enum class Testamento {
+    OLD, NEW
+}
+
+data class Libro(
+    val id: Int,
+    val esKey: String,
+    val enKey: String,
+    val nombreEs: String,
+    val nombreEn: String,
+    val abreviaturaEs: String,
+    val abreviaturaEn: String,
+    val testamento: Testamento,
+    val totalCapitulos: Int,
+    val capitulos: MutableList<Capitulo> = mutableListOf()
+)
+
+data class Capitulo(
+    val numero: Int,
+    val bloques: List<BloqueContenido>, // Flujo ordenado de Parrafos, Estrofas, Titulos e Intros
+    val versiculos: List<Versiculo>     // Índice canónico plano para búsquedas por número de versículo
+)
+
+// ==========================================
+// 5. DTOs PARA DESSERIALIZACIÓN DIRECTA DE LOS JSON
+// ==========================================
+
+data class LibroDto(
+    val id: Int,
+    val esKey: String,
+    val enKey: String,
+    val es: String,
+    val en: String,
+    val abbr: String,
+    val testament: String,
+    val chapters: Int,
+    val enAbbr: String
+)
+/*
+data class EntradaTextoJsonDto(
+    val pre: String? = null,
+    val verse: Int? = null,
+    val text: String? = null,
+    val text2: String? = null,
+    val title: String? = null,
+    @SerializedName("title_key") val titleKey: String? = null,
+    @SerializedName("title_in") val titleIn: String? = null,
+    @SerializedName("title_in_key") val titleInKey: String? = null
+)
+
+ */
