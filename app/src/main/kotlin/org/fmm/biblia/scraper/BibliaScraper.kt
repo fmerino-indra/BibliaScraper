@@ -2,6 +2,7 @@ package org.fmm.biblia.scraper
 
 import org.fmm.biblia.scraper.data.Capitulo
 import org.fmm.biblia.scraper.data.CategoriaDocumento
+import org.fmm.biblia.scraper.data.ContextoParseo
 import org.fmm.biblia.scraper.data.DocumentoBiblico
 import org.fmm.biblia.scraper.data.IElementoVersiculo
 import org.fmm.biblia.scraper.data.NotaAlPie
@@ -19,6 +20,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
+import org.jsoup.select.Elements
 
 object BibliaScraper {
 
@@ -32,7 +34,7 @@ object BibliaScraper {
     }
 
     // 2. Descarga y limpia la página objetivo
-    fun descargarYLimpiar(url: String): Document {
+    private fun descargarYLimpiar(url: String): Document {
         val respuesta = Jsoup.connect(url)
             .userAgent("Mozilla/5.0 (X11; Fedora; Linux x86_64)")
             .timeout(100_000)
@@ -43,7 +45,7 @@ object BibliaScraper {
     }
 
     // 3. Orquestador del parseo
-    fun parsearDocumento(
+    fun parsearURLBible(
         idDoc: String,
         titulo: String,
         urlTexto: String,
@@ -54,7 +56,10 @@ object BibliaScraper {
         val docHtml = descargarYLimpiar(urlTexto)
 
         val seccionesIntro = parsearSeccionesIntroduccion(docHtml)
-        val capitulos = parsearCapitulosDesdeArea(docHtml)
+
+        // Aquí, vamos a partir este método
+//        val capitulos = parsearCapitulosDesdeArea(docHtml)
+        val caps = parsearHTMLDocument(docHtml)
 
         return DocumentoBiblico(
             id = idDoc,
@@ -63,13 +68,108 @@ object BibliaScraper {
             orden = 1,
             urlOrigen = urlTexto,
             seccionesIntroduccion = seccionesIntro,
-            capitulosLibro = capitulos,
+            capitulosLibro = caps,
         )
     }
 
     private fun parsearSeccionesIntroduccion(doc: Document): List<SeccionIntroduccion> {
         // Lógica de extracción de párrafos de introducción
         return emptyList()
+    }
+
+    private fun parsearHTMLDocument(doc: Document): List<Capitulo> {
+        val areaContenido = doc.selectFirst("div.ddbEbookContent") ?: return emptyList()
+
+        // Inicializamos nuestro estado compartido
+        val contexto = ContextoParseo()
+
+
+        //val capitulos = mutableListOf<Capitulo>()
+
+        // Hijos de <div class="ddbEbookContent"> comenzando por indexInicio
+        // (siempre hay una clase pba por ahí justo después del índice del libro.
+        val elementos = areaContenido.children()
+        var indexInicio = elementos.indexOfFirst {
+            it.hasClass("pba")
+        }
+        if (indexInicio == -1)
+            indexInicio = 0
+
+        parsearHTMLElements(elementos, indexInicio, contexto)
+
+        // Consolidamos el último capítulo al terminar todo el árbol
+        contexto.consolidarCapitulo()
+
+        return contexto.capitulos
+    }
+
+    private fun parsearHTMLElements(elements: Elements, indexInicio: Int=0, ctx: ContextoParseo) {
+        //val capitulos = mutableListOf<Capitulo>()
+
+//        var numCapituloActual = 1
+//        var versiculosActuales = mutableListOf<Versiculo>()
+//        var titulosPendientes = mutableListOf<Titulo>()
+
+        for (i in indexInicio until elements.size) {
+            val elem = elements[i]
+
+            when {
+                // #<hX>: Títulos (Pueden contener paralelos y notas en cualquier orden; no versículos)
+                elem.tagName() in listOf("h1", "h2", "h3", "h4") -> {
+                    val nivel = elem.tagName().removePrefix("h").toIntOrNull() ?: 1
+                    val titulo = parsearEncabezado(elem, ctx.numCapituloActual, ctx.titulosPendientes.size + 1, nivel)
+                    ctx.titulosPendientes.add(titulo)
+                }
+
+                // #<p>: Párrafos de texto (Pueden contener cambio de capítulo, versículos, notas y paralelos)
+                elem.tagName() == "p" && (elem.hasClass("ddb6") || elem.hasClass("noindent")) -> {
+
+                    // ## Detección de cambio de capítulo por <span class="capital1">
+                    val spanCapital = elem.selectFirst("span.capital1")
+                    if (spanCapital != null) {
+                        val numCapDetectado = spanCapital.text().replace(Regex("[^0-9]"), "").toIntOrNull()
+                        if (numCapDetectado != null) {
+                            ctx.consolidarCapitulo()
+                            ctx.numCapituloActual = numCapDetectado
+                        }
+                    }
+
+                    // Extraemos pasando el capítulo que figura en el contexto
+                    val versiculosDelParrafo = extraerVersiculosDeElemento(elem, ctx.numCapituloActual, ctx.titulosPendientes)
+
+                    // [FMMP] Versículos huérfanos,
+                    // significa que la segunda parte de un versículo está en párrafo aparte.
+                    for (v in versiculosDelParrafo) {
+                        if (v.numero == -1) {
+                            if (ctx.versiculosActuales.isNotEmpty()) {
+                                val ultimo = ctx.versiculosActuales.last()
+                                //[FMMP] Coger el último y añadirle un <BR>
+                                //ultimo.addParagraph()
+                                ultimo.contenido.addListIElementVersiculoToVersiculo(v.contenido)
+                                ultimo.paralelos.addAll(v.paralelos)
+                            }
+                        } else {
+                            ctx.versiculosActuales.add(v)
+                        }
+                    }
+                    if (ctx.versiculosActuales.isNotEmpty()) {
+                        // [FMMP] Al último versículo le añadimos un salto
+                        val ultimo = ctx.versiculosActuales.last()
+                        ultimo.addParagraph()
+                    } else {
+                        println("[FMMP]")
+                    }
+                } // <p>
+                // 🌟 EL DIV U OTRA ESTRUCTURA ANIDADA: Nos metemos recursivamente en vivo
+                elem.tagName() == "div" -> {
+                    // Llamamos a este mismo método para que procese los hijos del div.
+                    // IMPORTANTE: Le pasamos el mismo 'ctx'. Todo lo que descubra ahí dentro
+                    // se sumará al capítulo y versículo en el que estamos actualmente.
+                    // El indexInicio para sus hijos vuelve a ser 0.
+                    parsearHTMLElements(elements = elem.children(), indexInicio = 0, ctx = ctx)
+                }
+            } //when
+        } // for
     }
 
 //    fun parsearCapitulosDesdeArea(doc: Document): List<Capitulo> {
@@ -242,13 +342,10 @@ object BibliaScraper {
                     idHtml = idHtmlVerActual,
                     capitulo = numCapitulo,
                     numero = numVerActual,
-//                    contenido = textoVerLista.distinct().toMutableList(),
                     paralelos = paralelosVerActual.distinct().toMutableList(),
-//                    titulosPrevios = titulosPrevios.distinct()
                 )
                 nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(titulosPrevios)
                 nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(textoVerLista)
-
 
                 titulosPrevios.clear()
                 notasPendientes.vincularA(nuevoVersiculo)
@@ -263,6 +360,26 @@ object BibliaScraper {
                 // Puede arrastrar títulos, etc.
                 // Por aquí pasa cuando es el primer versículo de un párrafo.
                 //println("[FMMP] ${Thread.currentThread().stackTrace[1].methodName} Capítulo: $numCapitulo | Texto: $textoLimpio ")
+
+                val nuevoVersiculo = Versiculo(
+                    id = "ver_${numCapitulo}_$numVerActual",
+                    idHtml = idHtmlVerActual,
+                    capitulo = numCapitulo,
+                    numero = numVerActual,
+                    paralelos = paralelosVerActual.distinct().toMutableList()
+                )
+                nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(titulosPrevios)
+                nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(textoVerLista)
+
+                titulosPrevios.clear()
+                notasPendientes.vincularA(nuevoVersiculo)
+                resultado.add(nuevoVersiculo)
+
+                textoVerActual.clear()
+                textoVerLista.clear()
+                paralelosVerActual.clear()
+                numVerActual = -1
+                versiculoHuerfano = false
             }
         }
 
@@ -357,15 +474,15 @@ object BibliaScraper {
                         //textoVerLista.add(TextoPlano(textoLimpio))
                     }
                 }
-            }
-        }
+            } // when
+        } // fun procesarNodoInterno
 
         for (nodoHijo in parrafo.childNodes()) {
             procesarNodoInterno(nodoHijo)
         }
 
         consolidarVersiculo()
-
+        consolidarVersiculoHuerfano()
         //[FMMP] Añade fin de párrafo al último fragmento del último versículo
         /* Para después
         if (resultado.isNotEmpty()) {
@@ -376,12 +493,12 @@ object BibliaScraper {
         return resultado
     }
 
-    private fun addTextoPlanoVersiculo(textoVerLista: MutableList<IElementoVersiculo>, textoLimpio: String) {
+    private fun addTextoPlanoVersiculo(contenidoVersiculo: MutableList<IElementoVersiculo>, textoLimpio: String) {
         if (textoLimpio.isBlank() || textoLimpio == "*")
             return
-        val ultimo = textoVerLista.lastOrNull()
+        val ultimo = contenidoVersiculo.lastOrNull()
         if (ultimo is TextoPlano) {
-            val indiceUltimo = textoVerLista.lastIndex
+            val indiceUltimo = contenidoVersiculo.lastIndex
 
             // 1. Tomamos el primer carácter del texto que va a entrar
             val primerCaracter = textoLimpio.first()
@@ -391,10 +508,10 @@ object BibliaScraper {
             val conector = if (primerCaracter in signosSinEspacioPrevio) "" else " "
 
             // 4. Reemplazamos el último elemento con los textos combinados
-            textoVerLista[indiceUltimo]=TextoPlano(ultimo.texto + conector + textoLimpio)
+            contenidoVersiculo[indiceUltimo]=TextoPlano(ultimo.texto + conector + textoLimpio)
 
         } else {
-            textoVerLista.add(TextoPlano(textoLimpio))
+            contenidoVersiculo.add(TextoPlano(textoLimpio))
         }
 
     }

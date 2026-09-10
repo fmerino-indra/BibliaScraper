@@ -10,7 +10,7 @@ class App {
         val libroGenesis = "libro01gn.html"
         val libroExodo   = "libro02ex.html"
 
-        val documento = BibliaScraper.parsearDocumento(
+        val documento = BibliaScraper.parsearURLBible(
             idDoc = "LIB_GN",
             titulo = "Génesis",
             urlTexto = urlBase + libroGenesis,

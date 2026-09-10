@@ -235,3 +235,26 @@ data class DocumentoBiblico(
     val seccionesIntroduccion: List<SeccionIntroduccion> = emptyList(),
     val capitulosLibro: List<Capitulo> = emptyList()
 )
+
+class ContextoParseo {
+    var numCapituloActual: Int = 1
+    val capitulos: MutableList<Capitulo> = mutableListOf()
+    var versiculosActuales: MutableList<Versiculo> = mutableListOf()
+    var titulosPendientes: MutableList<Titulo> = mutableListOf()
+
+    // Un método auxiliar para consolidar el capítulo actual cuando toca cambio
+    fun consolidarCapitulo() {
+        if (versiculosActuales.isNotEmpty()) {
+            capitulos.add(
+                Capitulo(
+                    id = "cap_$numCapituloActual",
+                    numero = numCapituloActual,
+                    titulosPrevios = titulosPendientes.toList(),
+                    versiculos = versiculosActuales.toList()
+                )
+            )
+            versiculosActuales = mutableListOf()
+            titulosPendientes = mutableListOf()
+        }
+    }
+}
