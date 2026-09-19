@@ -1,5 +1,6 @@
 package org.fmm.biblia.scraper
 
+import kotlinx.serialization.json.Json
 import org.fmm.biblia.scraper.data.Capitulo
 import org.fmm.biblia.scraper.data.CategoriaDocumento
 import org.fmm.biblia.scraper.data.ContextoParseo
@@ -15,15 +16,21 @@ import org.fmm.biblia.scraper.data.registrarNota
 import org.fmm.biblia.scraper.data.registrarParalelo
 import org.fmm.biblia.scraper.data.vincularA
 import org.fmm.biblia.scraper.data.addListIElementVersiculoToVersiculo
+import org.fmm.biblia.scraper.data.dto.LibroDto
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import org.jsoup.select.Elements
+import java.io.File
 
 object BibliaScraper {
 
+
+    fun buildVersiculoId(capitulo: Int, numero: Int): String {
+        return "ver_${capitulo}_$numero"
+    }
     // 1. Sanitizador para limpiar el HTML malformado antes de que Jsoup cree el DOM
     private fun sanitizarHtml(rawHtml: String): String {
         return rawHtml
@@ -45,29 +52,30 @@ object BibliaScraper {
     }
 
     // 3. Orquestador del parseo
-    fun parsearURLBible(
-        idDoc: String,
-        titulo: String,
-        urlTexto: String,
+    fun downloadAndParseURLBook(
+        //idDoc: String,
+        libroDto: LibroDto,
+        urlBase: String,
         urlNotas: String? = null
     ): DocumentoBiblico {
 
         // A) Descargar y parsear el documento principal
-        val docHtml = descargarYLimpiar(urlTexto)
+        val docHtml = descargarYLimpiar(urlBase + libroDto.url)
 
         val seccionesIntro = parsearSeccionesIntroduccion(docHtml)
 
-        // Aquí, vamos a partir este método
-//        val capitulos = parsearCapitulosDesdeArea(docHtml)
         val caps = parsearHTMLDocument(docHtml)
 
         return DocumentoBiblico(
-            id = idDoc,
-            titulo = titulo,
+            id = libroDto.id,
+            key = libroDto.esKey,
+            titulo = libroDto.es,
+            abreviatura = libroDto.abbr,
             categoria = CategoriaDocumento.LIBRO,
-            orden = 1,
-            urlOrigen = urlTexto,
+            orden = libroDto.id,
+            urlOrigen = urlBase+libroDto.url,
             seccionesIntroduccion = seccionesIntro,
+            capitulosEsperados = libroDto.chapters,
             capitulosLibro = caps,
         )
     }
@@ -77,12 +85,11 @@ object BibliaScraper {
         return emptyList()
     }
 
-    private fun parsearHTMLDocument(doc: Document): List<Capitulo> {
-        val areaContenido = doc.selectFirst("div.ddbEbookContent") ?: return emptyList()
+    private fun parsearHTMLDocument(doc: Document): Map<Int, Capitulo> {
+        val areaContenido = doc.selectFirst("div.ddbEbookContent") ?: return emptyMap()
 
         // Inicializamos nuestro estado compartido
         val contexto = ContextoParseo()
-
 
         //val capitulos = mutableListOf<Capitulo>()
 
@@ -100,7 +107,8 @@ object BibliaScraper {
         // Consolidamos el último capítulo al terminar todo el árbol
         contexto.consolidarCapitulo()
 
-        return contexto.capitulos
+        return contexto.capitulos.associateBy { capitulo -> capitulo.numero }
+        //return contexto.capitulos
     }
 
     private fun parsearHTMLElements(elements: Elements, indexInicio: Int=0, ctx: ContextoParseo) {
@@ -171,113 +179,6 @@ object BibliaScraper {
             } //when
         } // for
     }
-
-//    fun parsearCapitulosDesdeArea(doc: Document): List<Capitulo> {
-    fun parsearCapitulosDesdeArea(doc: Element): List<Capitulo> {
-        val areaContenido = doc.selectFirst("div.ddbEbookContent") ?: return emptyList()
-        val capitulos = mutableListOf<Capitulo>()
-
-        var numCapituloActual = 1
-        var versiculosActuales = mutableListOf<Versiculo>()
-        var titulosPendientes = mutableListOf<Titulo>()
-
-        val elementos = areaContenido.children()
-        var indexInicio = elementos.indexOfFirst { it.hasClass("pba") }
-        if (indexInicio == -1) indexInicio = 0
-
-        for (i in indexInicio until elementos.size) {
-            val elem = elementos[i]
-
-            when {
-                // #<hX>: Títulos (Pueden contener paralelos y notas en cualquier orden; no versículos)
-                elem.tagName() in listOf("h1", "h2", "h3", "h4") -> {
-                    val nivel = elem.tagName().removePrefix("h").toIntOrNull() ?: 1
-                    val titulo = parsearEncabezado(elem, numCapituloActual, titulosPendientes.size + 1, nivel)
-                    titulosPendientes.add(titulo)
-                }
-
-                // #<p>: Párrafos de texto (Pueden contener cambio de capítulo, versículos, notas y paralelos)
-                elem.tagName() == "p" && (elem.hasClass("ddb6") || elem.hasClass("noindent")) -> {
-
-                    // ## Detección de cambio de capítulo por <span class="capital1">
-                    val spanCapital = elem.selectFirst("span.capital1")
-                    if (spanCapital != null) {
-                        val numCapDetectado = spanCapital.text().replace(Regex("[^0-9]"), "").toIntOrNull()
-
-                        // [FMMP] Me pasé de listo, crea el capítulo anterior
-                        // cuando encuentra uno nuevo
-                        /*
-                        if (numCapDetectado != null) {
-                            numCapituloActual = numCapDetectado
-                        }
-
-                         */
-                        if (numCapDetectado != null) {
-                            if (versiculosActuales.isNotEmpty()) {
-                                capitulos.add(
-                                    Capitulo(
-                                        id = "cap_$numCapituloActual",
-                                        numero = numCapituloActual,
-                                        titulosPrevios = titulosPendientes.toList(),
-                                        versiculos = versiculosActuales.toList()
-                                    )
-                                )
-                                versiculosActuales = mutableListOf()
-                                titulosPendientes = mutableListOf()
-                            }
-                            numCapituloActual = numCapDetectado
-                        }
-                    }
-
-                    val versiculosDelParrafo = extraerVersiculosDeElemento(elem, numCapituloActual, titulosPendientes)
-
-                    // [FMMP] Versículos huérfanos, significa que la segunda parte de un versículo está en párrafo aparte.
-                    for (v in versiculosDelParrafo) {
-                        if (v.numero == -1) {
-                            if (versiculosActuales.isNotEmpty()) {
-                                val ultimo = versiculosActuales.last()
-                                //[FMMP] Coger el último y añadirle un <BR>
-                                ultimo.addParagraph()
-                                ultimo.contenido.addListIElementVersiculoToVersiculo(v.contenido)
-                                ultimo.paralelos.addAll(v.paralelos)
-                            }
-                        } else {
-                            versiculosActuales.add(v)
-                        }
-                    }
-                    if (versiculosActuales.isNotEmpty()) {
-                        // [FMMP] Al último versículo le añadimos un salto
-                        val ultimo = versiculosActuales.last()
-                        ultimo.addParagraph()
-                    } else {
-                        println("[FMMP]")
-                    }
-                } // <p>
-                else -> { // un <div>, por ejemplo
-                    for (nodoHijo in elem.childNodes()) {
-                        if (nodoHijo is Element) {
-                            parsearCapitulosDesdeArea(nodoHijo)
-                        }
-                    }
-                }
-            } //when
-
-        } // for
-        // Ultimo capítulo
-        if (versiculosActuales.isNotEmpty()) {
-            capitulos.add(
-                Capitulo(
-                    id = "cap_$numCapituloActual",
-                    numero = numCapituloActual,
-                    titulosPrevios = titulosPendientes.toList(),
-                    versiculos = versiculosActuales.toList()
-                )
-            )
-        }
-
-        return capitulos
-    }
-
     /**
      * Procesa etiquetas <hX> extrayendo de forma agnóstica al orden sus notas y paralelos.
      */
@@ -317,7 +218,6 @@ object BibliaScraper {
             paralelos = paralelos.distinctBy { it.cita }.toMutableList(),
         )
     }
-
     /**
      * Recorre linealmente las entrañas del <p>, extrayendo versículos a medida que los encuentra
      * en el árbol anidado de notas y paralelos.
@@ -332,84 +232,30 @@ object BibliaScraper {
         val paralelosVerActual = mutableListOf<Paralelo>()
         val notasPendientes = mutableListOf<NotaAlPie>()
 
-        var versiculoHuerfano=false
-
         fun consolidarVersiculo() {
             if (numVerActual != -1) {
-                val textoLimpio = textoVerActual.toString().trim().replace(Regex("\\s+"), " ")
-                val nuevoVersiculo = Versiculo(
-                    id = "ver_${numCapitulo}_$numVerActual",
-                    idHtml = idHtmlVerActual,
-                    capitulo = numCapitulo,
-                    numero = numVerActual,
-                    paralelos = paralelosVerActual.distinct().toMutableList(),
-                )
-                nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(titulosPrevios)
-                nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(textoVerLista)
-
-                titulosPrevios.clear()
-                notasPendientes.vincularA(nuevoVersiculo)
-                resultado.add(nuevoVersiculo)
-
-                textoVerActual.clear()
-                textoVerLista.clear()
-                paralelosVerActual.clear()
-                numVerActual = -1
-            } else {
-                // Este caso es que exista un fragmento que no se ha asignado a un versículo ya creado en párrafo anterior.
-                // Puede arrastrar títulos, etc.
-                // Por aquí pasa cuando es el primer versículo de un párrafo.
                 //println("[FMMP] ${Thread.currentThread().stackTrace[1].methodName} Capítulo: $numCapitulo | Texto: $textoLimpio ")
-
-                val nuevoVersiculo = Versiculo(
-                    id = "ver_${numCapitulo}_$numVerActual",
-                    idHtml = idHtmlVerActual,
-                    capitulo = numCapitulo,
-                    numero = numVerActual,
-                    paralelos = paralelosVerActual.distinct().toMutableList()
-                )
-                nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(titulosPrevios)
-                nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(textoVerLista)
-
-                titulosPrevios.clear()
-                notasPendientes.vincularA(nuevoVersiculo)
-                resultado.add(nuevoVersiculo)
-
-                textoVerActual.clear()
-                textoVerLista.clear()
-                paralelosVerActual.clear()
-                numVerActual = -1
-                versiculoHuerfano = false
             }
-        }
+            val textoLimpio = textoVerActual.toString().trim().replace(Regex("\\s+"), " ")
+            val nuevoVersiculo = Versiculo(
+//                id = "ver_${numCapitulo}_$numVerActual",
+                id = buildVersiculoId(numCapitulo, numVerActual),
+                idHtml = idHtmlVerActual,
+                capitulo = numCapitulo,
+                numero = numVerActual,
+                paralelos = paralelosVerActual.distinct().toMutableList(),
+            )
+            nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(titulosPrevios)
+            nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(textoVerLista)
 
-        fun consolidarVersiculoHuerfano() {
+            titulosPrevios.clear()
+            notasPendientes.vincularA(nuevoVersiculo)
+            resultado.add(nuevoVersiculo)
 
-            if (versiculoHuerfano) {
-                println("[FMMP] ${Thread.currentThread().stackTrace[1].methodName} Capítulo: $numCapitulo | Texto: $textoVerLista | Paralelos: $paralelosVerActual | Notas: $notasPendientes | versiculoHuerfano: $versiculoHuerfano")
-                //addTextoPlanoVersiculo(textoVerLista, textoLimpio)
-                val nuevoVersiculo = Versiculo(
-                    id = "ver_${numCapitulo}_$numVerActual",
-                    idHtml = idHtmlVerActual,
-                    capitulo = numCapitulo,
-                    numero = numVerActual,
-//                    contenido = textoVerLista.distinct().toMutableList(),
-                    paralelos = paralelosVerActual.distinct().toMutableList()
-                )
-                nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(titulosPrevios)
-                nuevoVersiculo.contenido.addListIElementVersiculoToVersiculo(textoVerLista)
-                titulosPrevios.clear()
-
-                notasPendientes.vincularA(nuevoVersiculo)
-                resultado.add(nuevoVersiculo)
-
-                textoVerActual.clear()
-                textoVerLista.clear()
-                paralelosVerActual.clear()
-                numVerActual = -1
-                versiculoHuerfano = false
-
-            }
+            textoVerActual.clear()
+            textoVerLista.clear()
+            paralelosVerActual.clear()
+            numVerActual = -1
         }
 
         fun procesarNodoInterno(nodo: Node) {
@@ -421,11 +267,11 @@ object BibliaScraper {
                         // Número de versículo: punto de corte y consolidación
                         tag == "sup" && nodo.id().startsWith("v") -> {
                             if (textoVerLista.isNotEmpty() && numVerActual == -1) {
-                                //println("[FMMP] ${Thread.currentThread().stackTrace[1].methodName} Capítulo: $numCapitulo | Texto: SPM")
-                                versiculoHuerfano=true
-                                consolidarVersiculoHuerfano()
+                                consolidarVersiculo()
+                            } else if (numVerActual != -1) {
+                                consolidarVersiculo()
                             }
-                            consolidarVersiculo()
+
                             idHtmlVerActual = nodo.id()
                             numVerActual = nodo.text().replace(Regex("[^0-9]"), "").toIntOrNull() ?: -1
                             return
@@ -446,12 +292,12 @@ object BibliaScraper {
                                 paralelosVerActual.add(Paralelo(cita = ref, destino = ref))
                             }
                         }
-                    }
+                    } // when
 
                     for (hijo in nodo.childNodes()) {
                         procesarNodoInterno(hijo)
                     }
-                }
+                } // Element
 
                 is TextNode -> {
                     val texto = nodo.text()
@@ -461,19 +307,11 @@ object BibliaScraper {
                     val parent = nodo.parent() as? Element
                     val esSpanCapital = parent?.tagName() == "span" && parent.hasClass("capital1")
 
-//                    if (!esSpanCapital && texto.isNotBlank() && numVerActual != -1) {
                     if (!esSpanCapital && texto.isNotBlank()) {
-                        if (numVerActual == -1) {
-
-//                            println("[FMMP] ${Thread.currentThread().stackTrace[1].methodName} Capítulo: $numCapitulo | Texto: $textoLimpio  ")
-//                            versiculoHuerfano=true
-//                            consolidarVersiculoHuerfano(textoLimpio)
-                        }
                         textoVerActual.append(textoLimpio)
                         addTextoPlanoVersiculo(textoVerLista, textoLimpio)
-                        //textoVerLista.add(TextoPlano(textoLimpio))
                     }
-                }
+                } // TextNode
             } // when
         } // fun procesarNodoInterno
 
@@ -481,15 +319,10 @@ object BibliaScraper {
             procesarNodoInterno(nodoHijo)
         }
 
-        consolidarVersiculo()
-        consolidarVersiculoHuerfano()
-        //[FMMP] Añade fin de párrafo al último fragmento del último versículo
-        /* Para después
-        if (resultado.isNotEmpty()) {
-            val ultimo = resultado.last()
-            resultado[resultado.size - 1] = ultimo.copy(texto = "${ultimo.texto} [BR]")
+        if (numVerActual != -1 || textoVerLista.isNotEmpty()) {
+            consolidarVersiculo()
         }
-        */
+
         return resultado
     }
 
@@ -550,4 +383,20 @@ object BibliaScraper {
         }
     }
 
+    fun guardarDocumentoBiblicoJson(documento: DocumentoBiblico, rutaArchivo: String) {
+        // 1. Configuramos el motor JSON para que el archivo sea legible por humanos (bonito)
+        val jsonConfig = Json {
+            prettyPrint = true
+            ignoreUnknownKeys = true // Por seguridad si lees JSONs externos en el futuro
+        }
+
+        // 2. Convertimos el objeto en una cadena de texto JSON
+        val jsonString = jsonConfig.encodeToString(documento)
+
+        // 3. Creamos el archivo físico y volcamos el texto inmediatamente
+        val archivo = File(rutaArchivo)
+        archivo.writeText(jsonString, Charsets.UTF_8) // Forzamos UTF_8 para no romper tildes ni eñes
+
+        println("✅ Estructura exportada con éxito a: ${archivo.absolutePath}")
+    }
 }

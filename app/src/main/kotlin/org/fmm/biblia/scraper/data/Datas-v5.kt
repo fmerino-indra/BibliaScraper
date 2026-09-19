@@ -1,6 +1,8 @@
 package org.fmm.biblia.scraper.data
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.fmm.biblia.scraper.data.dto.TipoTestamento
 
 @Serializable
 sealed interface Notable {
@@ -69,24 +71,24 @@ data class Parrafo(
 data class Versiculo(
     override val id: String,
     override val idHtml: String? = null,
-    override val llamadasNotas: List<NotaAlPie> = mutableListOf(),
-    override val titulosPrevios: List<Titulo> = emptyList(),       // Complemento: perícopas intermedias
-    override val paralelos: MutableList<Paralelo> = mutableListOf(),
     val capitulo: Int,
     val numero: Int,
     val esPoesia: Boolean = false,                         // Complemento: indicador de formato poético
+    override val llamadasNotas: List<NotaAlPie> = mutableListOf(),
+    override val titulosPrevios: List<Titulo> = emptyList(),       // Complemento: perícopas intermedias
+    override val paralelos: MutableList<Paralelo> = mutableListOf(),
     val contenido: MutableList<IElementoVersiculo> = mutableListOf()
 ) : Notable, Paralelizable, Titulable {
 
     constructor(
         id: String,
         idHtml: String? = null,
-        llamadasNotas: List<NotaAlPie> = mutableListOf(),
-        titulosPrevios: List<Titulo> = emptyList(),       // Complemento: perícopas intermedias
-        paralelos: MutableList<Paralelo> = mutableListOf(),
         capitulo: Int,
         numero: Int,
         esPoesia: Boolean = false,                         // Complemento: indicador de formato poético
+        llamadasNotas: List<NotaAlPie> = mutableListOf(),
+        titulosPrevios: List<Titulo> = emptyList(),       // Complemento: perícopas intermedias
+        paralelos: MutableList<Paralelo> = mutableListOf(),
         elemento:IElementoVersiculo
     ) : this(
         id = id,
@@ -103,12 +105,12 @@ data class Versiculo(
     constructor(
         id: String,
         idHtml: String? = null,
-        llamadasNotas: List<NotaAlPie> = mutableListOf(),
-        titulosPrevios: List<Titulo> = emptyList(),       // Complemento: perícopas intermedias
-        paralelos: MutableList<Paralelo> = mutableListOf(),
         capitulo: Int,
         numero: Int,
         esPoesia: Boolean = false,                         // Complemento: indicador de formato poético
+        llamadasNotas: List<NotaAlPie> = mutableListOf(),
+        titulosPrevios: List<Titulo> = emptyList(),       // Complemento: perícopas intermedias
+        paralelos: MutableList<Paralelo> = mutableListOf(),
         textoString: String
     ) : this(
         id = id,
@@ -220,12 +222,13 @@ fun MutableList<IElementoVersiculo>.addListIElementVersiculoToVersiculo(contenid
 }
 
 enum class CategoriaDocumento { LIBRO, INTRODUCCION }
-enum class TipoTestamento { ANTIGUO_TESTAMENTO, NUEVO_TESTAMENTO, OTRO }
 
 @Serializable
 data class DocumentoBiblico(
-    val id: String,
-    val idHtml: String? = null,
+    val id:Int,
+//    val id: String,
+//    val idHtml: String? = null,
+    val key: String,
     val titulo: String,
     val abreviatura: String? = null,                       // Complemento: abreviatura del libro/documento
     val categoria: CategoriaDocumento,
@@ -233,7 +236,8 @@ data class DocumentoBiblico(
     val orden: Int,
     val urlOrigen: String,
     val seccionesIntroduccion: List<SeccionIntroduccion> = emptyList(),
-    val capitulosLibro: List<Capitulo> = emptyList()
+    val capitulosEsperados: Int,
+    val capitulosLibro: Map<Int,Capitulo> = emptyMap()
 )
 
 class ContextoParseo {

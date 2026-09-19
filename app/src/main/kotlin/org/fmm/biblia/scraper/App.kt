@@ -1,5 +1,7 @@
 package org.fmm.biblia.scraper
 
+import org.fmm.biblia.scraper.data.dto.LibroDto
+import org.fmm.biblia.scraper.data.dto.TipoTestamento
 import org.jsoup.Jsoup
 
 class App {
@@ -10,10 +12,21 @@ class App {
         val libroGenesis = "libro01gn.html"
         val libroExodo   = "libro02ex.html"
 
-        val documento = BibliaScraper.parsearURLBible(
-            idDoc = "LIB_GN",
-            titulo = "Génesis",
-            urlTexto = urlBase + libroGenesis,
+        val libroDto = LibroDto(
+            id=1,
+            orden=1,
+            esKey = "genesis",
+            es = "Génesis",
+            abbr = "Gn",
+            testament = TipoTestamento.ANTIGUO_TESTAMENTO,
+            chapters = 50,
+            url = "libro01gn.html"
+            )
+
+        val documento = BibliaScraper.downloadAndParseURLBook(
+//            idDoc = "LIB_GN",
+            libroDto = libroDto,
+            urlBase = urlBase,
             urlNotas = "https://www.edesclee.com/content/309-biblia-online-ed?page=notas01gn"
         )
 

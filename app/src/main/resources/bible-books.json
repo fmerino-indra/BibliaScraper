@@ -1,0 +1,732 @@
+[
+  {
+    "id": 1,
+    "orden": 1,
+    "esKey": "genesis",
+    "es": "Génesis",
+    "abbr": "Gn",
+    "testament": "old",
+    "chapters": 50,
+    "url": "libro01gn.html"
+  },
+  {
+    "id": 2,
+    "orden": 2,
+    "esKey": "exodo",
+    "es": "Éxodo",
+    "abbr": "Ex",
+    "testament": "old",
+    "chapters": 40,
+    "url": "libro02ex.html"
+  },
+  {
+    "id": 3,
+    "orden": 3,
+    "esKey": "levitico",
+    "es": "Levítico",
+    "abbr": "Lv",
+    "testament": "old",
+    "chapters": 27,
+    "url": "libro03lv.html"
+  },
+  {
+    "id": 4,
+    "orden": 4,
+    "esKey": "numeros",
+    "es": "Números",
+    "abbr": "Nm",
+    "testament": "old",
+    "chapters": 36,
+    "url": "libro04nm.html"
+  },
+  {
+    "id": 5,
+    "orden": 5,
+    "esKey": "deuteronomio",
+    "es": "Deuteronomio",
+    "abbr": "Dt",
+    "testament": "old",
+    "chapters": 34,
+    "url": "libro05dt.html"
+  },
+  {
+    "id": 6,
+    "orden": 6,
+    "esKey": "josue",
+    "es": "Josué",
+    "abbr": "Jos",
+    "testament": "old",
+    "chapters": 24,
+    "url": "libro06jos.html"
+  },
+  {
+    "id": 7,
+    "orden": 7,
+    "esKey": "jueces",
+    "es": "Jueces",
+    "abbr": "Jc",
+    "testament": "old",
+    "chapters": 21,
+    "url": "libro07jue.html"
+  },
+  {
+    "id": 8,
+    "orden": 8,
+    "esKey": "rut",
+    "es": "Rut",
+    "abbr": "Rt",
+    "testament": "old",
+    "chapters": 4,
+    "url": "libro08rt.html"
+  },
+  {
+    "id": 9,
+    "orden": 9,
+    "esKey": "primer_libro_de_samuel",
+    "es": "Primer libro de Samuel",
+    "abbr": "1 S",
+    "testament": "old",
+    "chapters": 31,
+    "url": "libro09s.html"
+  },
+  {
+    "id": 10,
+    "orden": 10,
+    "esKey": "segundo_libro_de_samuel",
+    "es": "Segundo libro de Samuel",
+    "abbr": "2 S",
+    "testament": "old",
+    "chapters": 24,
+    "url": "libro09s2.html"
+  },
+  {
+    "id": 11,
+    "orden": 11,
+    "esKey": "primer_libro_de_los_reyes",
+    "es": "Primer libro de los Reyes",
+    "abbr": "1 R",
+    "testament": "old",
+    "chapters": 22,
+    "url": "libro10r.html"
+  },
+  {
+    "id": 12,
+    "orden": 12,
+    "esKey": "segundo_libro_de_los_reyes",
+    "es": "Segundo libro de los Reyes",
+    "abbr": "2 R",
+    "testament": "old",
+    "chapters": 25,
+    "url": "libro10r2.html"
+  },
+  {
+    "id": 13,
+    "orden": 13,
+    "esKey": "primer_libro_de_cronicas",
+    "es": "Primer libro de las Crónicas",
+    "abbr": "1 Cro",
+    "testament": "old",
+    "chapters": 29,
+    "url": "libro11cr.html"
+  },
+  {
+    "id": 14,
+    "orden": 14,
+    "esKey": "segundo_libro_de_cronicas",
+    "es": "Segundo libro de las Crónicas",
+    "abbr": "2 Cro",
+    "testament": "old",
+    "chapters": 36,
+    "url": "libro11cr2.html"
+  },
+  {
+    "id": 15,
+    "orden": 15,
+    "esKey": "esdras",
+    "es": "Esdras",
+    "abbr": "Esd",
+    "testament": "old",
+    "chapters": 10,
+    "url": "libro12esd.html"
+  },
+  {
+    "id": 16,
+    "orden": 16,
+    "esKey": "nehemias",
+    "es": "Nehemías",
+    "abbr": "Ne",
+    "testament": "old",
+    "chapters": 13,
+    "url": "libro13neh.html"
+  },
+  {
+    "id": 17,
+    "orden": 17,
+    "esKey": "tobias",
+    "es": "Tobías",
+    "abbr": "Tb",
+    "testament": "old",
+    "chapters": 14,
+    "url": "libro14tb.html"
+  },
+  {
+    "id": 18,
+    "orden": 18,
+    "esKey": "judit",
+    "es": "Judit",
+    "abbr": "Jdt",
+    "testament": "old",
+    "chapters": 16,
+    "url": "libro15jdt.html"
+  },
+  {
+    "id": 19,
+    "orden": 19,
+    "esKey": "ester",
+    "es": "Ester",
+    "abbr": "Est",
+    "testament": "old",
+    "chapters": 10,
+    "url": "libro16est.html"
+  },
+  {
+    "id": 20,
+    "orden": 20,
+    "esKey": "primer_libro_de_los_macabeos",
+    "es": "Primer libro de los Macabeos",
+    "abbr": "1 M",
+    "testament": "old",
+    "chapters": 16,
+    "url": "libro17mac1.html"
+  },
+  {
+    "id": 21,
+    "orden": 21,
+    "esKey": "segundo_libro_de_los_macabeos",
+    "es": "Segundo libro de los Macabeos",
+    "abbr": "2 M",
+    "testament": "old",
+    "chapters": 15,
+    "url": "libro18mac2.html"
+  },
+  {
+    "id": 22,
+    "orden": 25,
+    "esKey": "job",
+    "es": "Job",
+    "abbr": "Jb",
+    "testament": "old",
+    "chapters": 42,
+    "url": "libro22job.html"
+  },
+  {
+    "id": 23,
+    "orden": 22,
+    "esKey": "salmos",
+    "es": "Salmos",
+    "abbr": "Sal",
+    "testament": "old",
+    "chapters": 150,
+    "url": "libro19sal.html"
+  },
+  {
+    "id": 24,
+    "orden": 26,
+    "esKey": "proverbios",
+    "es": "Proverbios",
+    "abbr": "Pr",
+    "testament": "old",
+    "chapters": 31,
+    "url": "libro23pr.html"
+  },
+  {
+    "id": 25,
+    "orden": 27,
+    "esKey": "qohelet_eclesiastes",
+    "es": "Eclesiastés (Qohelet)",
+    "abbr": "Qo",
+    "testament": "old",
+    "chapters": 12,
+    "url": "libro24ec.html"
+  },
+  {
+    "id": 26,
+    "orden": 23,
+    "esKey": "cantar_de_los_cantares",
+    "es": "Cantar de los Cantares",
+    "abbr": "Ct",
+    "testament": "old",
+    "chapters": 8,
+    "url": "libro20cnt.html"
+  },
+  {
+    "id": 27,
+    "orden": 28,
+    "esKey": "sabiduria",
+    "es": "Sabiduría",
+    "abbr": "Sb",
+    "testament": "old",
+    "chapters": 19,
+    "url": "libro25sab.html"
+  },
+  {
+    "id": 28,
+    "orden": 29,
+    "esKey": "siracida_eclesiastico",
+    "es": "Eclesiástico (Sirácida)",
+    "abbr": "Si",
+    "testament": "old",
+    "chapters": 52,
+    "url": "libro26eclo.html"
+  },
+  {
+    "id": 29,
+    "orden": 30,
+    "esKey": "isaias",
+    "es": "Isaías",
+    "abbr": "Is",
+    "testament": "old",
+    "chapters": 66,
+    "url": "libro27is.html"
+  },
+  {
+    "id": 30,
+    "orden": 31,
+    "esKey": "jeremias",
+    "es": "Jeremías",
+    "abbr": "Jr",
+    "testament": "old",
+    "chapters": 52,
+    "url": "libro28jer.html"
+  },
+  {
+    "id": 31,
+    "orden": 24,
+    "esKey": "lamentaciones",
+    "es": "Lamentaciones",
+    "abbr": "Lm",
+    "testament": "old",
+    "chapters": 5,
+    "url": "libro21lm.html"
+  },
+  {
+    "id": 32,
+    "orden": 32,
+    "esKey": "baruc",
+    "es": "Baruc",
+    "abbr": "Ba",
+    "testament": "old",
+    "chapters": 6,
+    "url": "libro29bar.html"
+  },
+  {
+    "id": 33,
+    "orden": 33,
+    "esKey": "ezequiel",
+    "es": "Ezequiel",
+    "abbr": "Ez",
+    "testament": "old",
+    "chapters": 48,
+    "url": "libro30ez.html"
+  },
+  {
+    "id": 34,
+    "orden": 34,
+    "esKey": "daniel",
+    "es": "Daniel",
+    "abbr": "Dn",
+    "testament": "old",
+    "chapters": 14,
+    "url": "libro31dn.html"
+  },
+  {
+    "id": 35,
+    "orden": 35,
+    "esKey": "oseas",
+    "es": "Oseas",
+    "abbr": "Os",
+    "testament": "old",
+    "chapters": 14,
+    "url": "libro32os.html"
+  },
+  {
+    "id": 36,
+    "orden": 36,
+    "esKey": "joel",
+    "es": "Joel",
+    "abbr": "Jl",
+    "testament": "old",
+    "chapters": 4,
+    "url": "libro33jl.html"
+  },
+  {
+    "id": 37,
+    "orden": 37,
+    "esKey": "amos",
+    "es": "Amós",
+    "abbr": "Am",
+    "testament": "old",
+    "chapters": 9,
+    "url": "libro34am.html"
+  },
+  {
+    "id": 38,
+    "orden": 38,
+    "esKey": "abdias",
+    "es": "Abdías",
+    "abbr": "Ab",
+    "testament": "old",
+    "chapters": 1,
+    "url": "libro35abd.html"
+  },
+  {
+    "id": 39,
+    "orden": 39,
+    "esKey": "jonas",
+    "es": "Jonás",
+    "abbr": "Jon",
+    "testament": "old",
+    "chapters": 4,
+    "url": "libro36jon.html"
+  },
+  {
+    "id": 40,
+    "orden": 40,
+    "esKey": "miqueas",
+    "es": "Miqueas",
+    "abbr": "Mi",
+    "testament": "old",
+    "chapters": 7,
+    "url": "libro37miq.html"
+  },
+  {
+    "id": 41,
+    "orden": 41,
+    "esKey": "nahum",
+    "es": "Nahúm",
+    "abbr": "Na",
+    "testament": "old",
+    "chapters": 3,
+    "url": "libro38nah.html"
+  },
+  {
+    "id": 42,
+    "orden": 42,
+    "esKey": "habacuc",
+    "es": "Habacuc",
+    "abbr": "Ha",
+    "testament": "old",
+    "chapters": 3,
+    "url": "libro39ab.html"
+  },
+  {
+    "id": 43,
+    "orden": 43,
+    "esKey": "sofonias",
+    "es": "Sofonías",
+    "abbr": "So",
+    "testament": "old",
+    "chapters": 3,
+    "url": "libro40sof.html"
+  },
+  {
+    "id": 44,
+    "orden": 44,
+    "esKey": "ageo",
+    "es": "Ageo",
+    "abbr": "Ag",
+    "testament": "old",
+    "chapters": 2,
+    "url": "libro41ag.html"
+  },
+  {
+    "id": 45,
+    "orden": 45,
+    "esKey": "zacarias",
+    "es": "Zacarías",
+    "abbr": "Za",
+    "testament": "old",
+    "chapters": 14,
+    "url": "libro42zac.html"
+  },
+  {
+    "id": 46,
+    "orden": 46,
+    "esKey": "malaquias",
+    "es": "Malaquías",
+    "abbr": "Ml",
+    "testament": "old",
+    "chapters": 3,
+    "url": "libro43mal.html"
+  },
+  {
+    "id": 47,
+    "orden": 47,
+    "esKey": "evangelio_segun_san_mateo",
+    "es": "Evangelio según san Mateo",
+    "abbr": "Mt",
+    "testament": "new",
+    "chapters": 28,
+    "url": "libro44mt.html"
+  },
+  {
+    "id": 48,
+    "orden": 48,
+    "esKey": "evangelio_segun_san_marcos",
+    "es": "Evangelio según san Marcos",
+    "abbr": "Mc",
+    "testament": "new",
+    "chapters": 16,
+    "url": "libro45mc.html"
+  },
+  {
+    "id": 49,
+    "orden": 49,
+    "esKey": "evangelio_segun_san_lucas",
+    "es": "Evangelio según san Lucas",
+    "abbr": "Lc",
+    "testament": "new",
+    "chapters": 24,
+    "url": "libro46lc.html"
+  },
+  {
+    "id": 50,
+    "orden": 50,
+    "esKey": "evangelio_segun_san_juan",
+    "es": "Evangelio según san Juan",
+    "abbr": "Jn",
+    "testament": "new",
+    "chapters": 21,
+    "url": "libro47jn.html"
+  },
+  {
+    "id": 51,
+    "orden": 51,
+    "esKey": "hechos_de_los_apostoles",
+    "es": "Hechos de los Apóstoles",
+    "abbr": "Hch",
+    "testament": "new",
+    "chapters": 28,
+    "url": "libro48hch.html"
+  },
+  {
+    "id": 52,
+    "orden": 52,
+    "esKey": "carta_a_los_romanos",
+    "es": "Romanos",
+    "abbr": "Rm",
+    "testament": "new",
+    "chapters": 16,
+    "url": "libro49ro.html"
+  },
+  {
+    "id": 53,
+    "orden": 53,
+    "esKey": "primera_carta_a_los_corintios",
+    "es": "Primera carta a los Corintios",
+    "abbr": "1 Co",
+    "testament": "new",
+    "chapters": 16,
+    "url": "libro50co1.html"
+  },
+  {
+    "id": 54,
+    "orden": 54,
+    "esKey": "segunda_carta_a_los_corintios",
+    "es": "Segunda carta a los Corintios",
+    "abbr": "2 Co",
+    "testament": "new",
+    "chapters": 13,
+    "url": "libro51co2.html"
+  },
+  {
+    "id": 55,
+    "orden": 55,
+    "esKey": "galatas",
+    "es": "Gálatas",
+    "abbr": "Ga",
+    "testament": "new",
+    "chapters": 6,
+    "url": "libro52gl.html"
+  },
+  {
+    "id": 56,
+    "orden": 56,
+    "esKey": "efesios",
+    "es": "Efesios",
+    "abbr": "Ef",
+    "testament": "new",
+    "chapters": 6,
+    "url": "libro53ef.html"
+  },
+  {
+    "id": 57,
+    "orden": 57,
+    "esKey": "filipenses",
+    "es": "Filipenses",
+    "abbr": "Flp",
+    "testament": "new",
+    "chapters": 4,
+    "url": "libro54flp.html"
+  },
+  {
+    "id": 58,
+    "orden": 58,
+    "esKey": "colosenses",
+    "es": "Colosenses",
+    "abbr": "Col",
+    "testament": "new",
+    "chapters": 4,
+    "url": "libro55col.html"
+  },
+  {
+    "id": 59,
+    "orden": 59,
+    "esKey": "primera_carta_a_los_tesalonicenses",
+    "es": "Primera carta a los Tesalonicenses",
+    "abbr": "1 Ts",
+    "testament": "new",
+    "chapters": 5,
+    "url": "libro56ts1.html"
+  },
+  {
+    "id": 60,
+    "orden": 60,
+    "esKey": "segunda_carta_a_los_tesalonicenses",
+    "es": "Segunda carta a los Tesalonicenses",
+    "abbr": "2 Ts",
+    "testament": "new",
+    "chapters": 3,
+    "url": "libro57ts2.html"
+  },
+  {
+    "id": 61,
+    "orden": 61,
+    "esKey": "primera_carta_a_timoteo",
+    "es": "Primera carta a Timoteo",
+    "abbr": "1 Tm",
+    "testament": "new",
+    "chapters": 6,
+    "url": "libro58ti1.html"
+  },
+  {
+    "id": 62,
+    "orden": 62,
+    "esKey": "segunda_carta_a_timoteo",
+    "es": "Segunda carta a Timoteo",
+    "abbr": "2 Tm",
+    "testament": "new",
+    "chapters": 4,
+    "url": "libro59ti2.html"
+  },
+  {
+    "id": 63,
+    "orden": 63,
+    "esKey": "carta_a_tito",
+    "es": "Tito",
+    "abbr": "Tt",
+    "testament": "new",
+    "chapters": 3,
+    "url": "libro60tit.html"
+  },
+  {
+    "id": 64,
+    "orden": 64,
+    "esKey": "carta_a_filemon",
+    "es": "Filemón",
+    "abbr": "Flm",
+    "testament": "new",
+    "chapters": 1,
+    "url": "libro61flm.html"
+  },
+  {
+    "id": 65,
+    "orden": 65,
+    "esKey": "carta_a_los_hebreos",
+    "es": "Hebreos",
+    "abbr": "Hb",
+    "testament": "new",
+    "chapters": 13,
+    "url": "libro62heb.html"
+  },
+  {
+    "id": 66,
+    "orden": 66,
+    "esKey": "epistola_de_santiago",
+    "es": "Santiago",
+    "abbr": "St",
+    "testament": "new",
+    "chapters": 5,
+    "url": "libro63stg.html"
+  },
+  {
+    "id": 67,
+    "orden": 67,
+    "esKey": "primera_epistola_de_san_pedro",
+    "es": "Primera carta de Pedro",
+    "abbr": "1 P",
+    "testament": "new",
+    "chapters": 5,
+    "url": "libro64p1.html"
+  },
+  {
+    "id": 68,
+    "orden": 68,
+    "esKey": "segunda_epistola_de_san_pedro",
+    "es": "Segunda carta de Pedro",
+    "abbr": "2 P",
+    "testament": "new",
+    "chapters": 3,
+    "url": "libro65p2.html"
+  },
+  {
+    "id": 69,
+    "orden": 69,
+    "esKey": "primera_epistola_de_san_juan",
+    "es": "Primera carta de Juan",
+    "abbr": "1 Jn",
+    "testament": "new",
+    "chapters": 5,
+    "url": "libro66jn1.html"
+  },
+  {
+    "id": 70,
+    "orden": 70,
+    "esKey": "segunda_epistola_de_san_juan",
+    "es": "Segunda carta de Juan",
+    "abbr": "2 Jn",
+    "testament": "new",
+    "chapters": 1,
+    "url": "libro67jn2.html"
+  },
+  {
+    "id": 71,
+    "orden": 71,
+    "esKey": "tercera_epistola_de_san_juan",
+    "es": "Tercera carta de Juan",
+    "abbr": "3 Jn",
+    "testament": "new",
+    "chapters": 1,
+    "url": "libro68jn3.html"
+  },
+  {
+    "id": 72,
+    "orden": 72,
+    "esKey": "epistola_de_san_judas",
+    "es": "Judas",
+    "abbr": "Jud",
+    "testament": "new",
+    "chapters": 1,
+    "url": "libro69jud.html"
+  },
+  {
+    "id": 73,
+    "orden": 73,
+    "esKey": "apocalipsis",
+    "es": "Apocalipsis",
+    "abbr": "Ap",
+    "testament": "new",
+    "chapters": 22,
+    "url": "libro70ap.html"
+  }
+]
