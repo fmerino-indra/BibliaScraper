@@ -1,13 +1,12 @@
 package org.fmm.biblia.scraper.data
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.fmm.biblia.scraper.data.dto.TipoTestamento
 
 @Serializable
 sealed interface Notable {
     val id: String
-    val idHtml: String?
+//    val idHtml: String?
     val llamadasNotas: List<NotaAlPie>
 }
 
@@ -52,7 +51,7 @@ data class Paralelo( // Pendiente de definir
 @Serializable
 data class Titulo(
     override val id: String,
-    override val idHtml: String? = null,
+//    override val idHtml: String? = null,
     override val llamadasNotas: List<NotaAlPie> = mutableListOf(),
     override val paralelos: List<Paralelo> = mutableListOf(),
     val texto: String, // Pendiente de definir
@@ -62,7 +61,7 @@ data class Titulo(
 @Serializable
 data class Parrafo(
     override val id: String,
-    override val idHtml: String? = null,
+//    override val idHtml: String? = null,
     override val llamadasNotas: List<NotaAlPie> = emptyList(),
     val texto: String // Pendiente de definir
 ) : Notable
@@ -70,7 +69,7 @@ data class Parrafo(
 @Serializable
 data class Versiculo(
     override val id: String,
-    override val idHtml: String? = null,
+//    override val idHtml: String? = null,
     val capitulo: Int,
     val numero: Int,
     val esPoesia: Boolean = false,                         // Complemento: indicador de formato poético
@@ -82,7 +81,7 @@ data class Versiculo(
 
     constructor(
         id: String,
-        idHtml: String? = null,
+//        idHtml: String? = null,
         capitulo: Int,
         numero: Int,
         esPoesia: Boolean = false,                         // Complemento: indicador de formato poético
@@ -92,7 +91,7 @@ data class Versiculo(
         elemento:IElementoVersiculo
     ) : this(
         id = id,
-        idHtml = idHtml,
+//        idHtml = idHtml,
         llamadasNotas = llamadasNotas,
         titulosPrevios = titulosPrevios,
         paralelos = paralelos,
@@ -104,7 +103,7 @@ data class Versiculo(
 
     constructor(
         id: String,
-        idHtml: String? = null,
+//        idHtml: String? = null,
         capitulo: Int,
         numero: Int,
         esPoesia: Boolean = false,                         // Complemento: indicador de formato poético
@@ -114,7 +113,7 @@ data class Versiculo(
         textoString: String
     ) : this(
         id = id,
-        idHtml = idHtml,
+//        idHtml = idHtml,
         llamadasNotas = llamadasNotas,
         titulosPrevios = titulosPrevios,
         paralelos = paralelos,
@@ -131,17 +130,17 @@ data class Versiculo(
 @Serializable
 data class Capitulo(
     override val id: String,
-    override val idHtml: String? = null,
+//    override val idHtml: String? = null,
     val numero: Int,
-    override val titulosPrevios: List<Titulo> = emptyList(),
-    val versiculos: List<Versiculo> = emptyList(),
-    override val llamadasNotas: List<NotaAlPie> = mutableListOf(),
+    override val titulosPrevios: MutableList<Titulo> = mutableListOf(),
+    val versiculos: MutableList<Versiculo> = mutableListOf(),
+    override val llamadasNotas: MutableList<NotaAlPie> = mutableListOf(),
 ) : Titulable
 
 @Serializable
 data class SeccionIntroduccion(
     override val id: String,
-    override val idHtml: String? = null,
+//    override val idHtml: String? = null,
     override val titulosPrevios: List<Titulo> = emptyList(),
     val parrafos: List<Parrafo> = emptyList(),
     override val llamadasNotas: List<NotaAlPie> = mutableListOf(),
@@ -239,7 +238,7 @@ data class DocumentoBiblico(
     val capitulosEsperados: Int,
     val capitulosLibro: Map<Int,Capitulo> = emptyMap()
 )
-
+/*
 class ContextoParseo {
     var numCapituloActual: Int = 1
     val capitulos: MutableList<Capitulo> = mutableListOf()
@@ -262,3 +261,4 @@ class ContextoParseo {
         }
     }
 }
+*/

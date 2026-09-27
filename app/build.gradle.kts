@@ -16,6 +16,8 @@ dependencies {
     // Project "app" depends on project "utils". (Project paths are separated with ":", so ":utils" refers to the top-level "utils" project.)
     implementation(project(":utils"))
     implementation(libs.jsoup)
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.12")
+    implementation("ch.qos.logback:logback-classic:1.6.3")
 
     // Runtime de kotlinx.serialization para JSON
     implementation(libs.kotlinx.serialization.json)

@@ -1,5 +1,6 @@
 package org.fmm.biblia.scraper
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import org.fmm.biblia.scraper.data.Capitulo
@@ -9,6 +10,7 @@ import org.fmmp.biblia.scraper.utils.RecursosUtils
 import org.junit.jupiter.api.BeforeEach
 
 class BibliaScraperTest2 {
+    private val logger = KotlinLogging.logger {}
 
     private lateinit var masterLibros: List<LibroDto>
     private lateinit var validaciones: Map<String,Map<String, Int>>
@@ -51,7 +53,7 @@ class BibliaScraperTest2 {
     private fun buildBook(key: Int, libroDto: LibroDto):DocumentoBiblico {
         val aux = "Key: $key -> ${libroDto.es} | ${libroDto.esKey}"
         println(aux)
-
+        logger.debug {aux}
         // a) Descarga html libro
         /*
         val libroDoc = Jsoup.connect(urlBiblia+libroDto.url)
@@ -95,7 +97,7 @@ class BibliaScraperTest2 {
             println("❌ ERROR: Capítulos mal parseados: esperados: $numCapitulosEsperados vs parseados: ${capitulosParseados.size}")
             return
         }
-
+        var erroresNum = 0
         for (i in 1.. numCapitulosEsperados) {
             val existe =capitulosParseados[i] != null
             if (!existe) {
@@ -108,11 +110,14 @@ class BibliaScraperTest2 {
             val esperados = versiculosEsperados[i.toString()]?:0
 
             if (cuenta == esperados) {
-                println("✅ ÉXITO: Capítulo $i parseado correctamente con $esperados versículos.")
+                //println("✅ ÉXITO: Capítulo $i parseado correctamente con $esperados versículos.")
             } else {
+                erroresNum++
                 println("❌ ERROR en Cap $i: Esperados $esperados, pero el algoritmo contó ${cap?.versiculos?.size?:0}.")
             }
         }
+        println("[FMMP] ${documento.titulo} -> $erroresNum Errores ")
+
     }
     private fun buildPageName(id:Int, key:String):String {
 // <9 ==
