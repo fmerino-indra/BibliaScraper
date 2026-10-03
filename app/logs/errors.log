@@ -1,0 +1,43 @@
+2026-10-01 08:10:00.257 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------
+2026-10-01 08:10:00.259 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - [FMMP] Ejecución 01/10/2026 08:10:00
+2026-10-01 08:10:00.259 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------
+2026-10-01 08:10:00.701 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - 2samuel: [19]
+2026-10-01 08:10:00.729 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - 1reyes: [4, 5, 11, 15]
+2026-10-01 08:10:00.781 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - 1cronicas: [3]
+2026-10-01 08:10:00.824 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - nehemias: [8, 10, 12]
+2026-10-01 08:10:00.852 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ester: [1, 3, 4, 5, 8, 9, 10]
+2026-10-01 08:10:00.877 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - 1macabeos: [14]
+2026-10-01 08:10:01.125 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - isaias: [8]
+2026-10-01 08:10:01.175 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - jeremias: [5]
+2026-10-01 08:10:01.184 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - lamentaciones: [2]
+2026-10-01 08:10:01.222 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ezequiel: [40]
+2026-10-01 08:10:01.275 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - nahum: [3]
+2026-10-01 08:10:01.284 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ageo: [2]
+2026-10-01 08:10:01.292 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - zacarias: [3, 4, 12]
+2026-10-01 08:10:01.318 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - evangelio_segun_san_mateo: [17, 18, 21, 23]
+2026-10-01 08:10:01.333 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - evangelio_segun_san_marcos: [9, 11, 15]
+2026-10-01 08:10:01.356 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - evangelio_segun_san_lucas: [17, 23]
+2026-10-01 08:10:01.374 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - evangelio_segun_san_juan: [5]
+2026-10-01 08:10:01.388 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - hechos_de_los_apostoles: [8, 15, 24]
+2026-10-01 08:10:01.395 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - carta_a_los_romanos: [1]
+2026-10-01 08:10:01.419 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - colosenses: [1]
+2026-10-01 08:10:01.421 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - primera_carta_a_los_tesalonicenses: [2]
+2026-10-03 10:09:14.749 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------
+2026-10-03 10:09:14.752 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - [FMMP] Ejecución 03/10/2026 10:09:14
+2026-10-03 10:09:14.753 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------
+2026-10-03 10:30:03.641 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - 1reyes: [4, 5, 11, 15]
+2026-10-03 10:30:17.766 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------
+2026-10-03 10:30:17.768 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - [FMMP] Ejecución 03/10/2026 10:30:17
+2026-10-03 10:30:17.770 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------
+2026-10-03 10:34:41.795 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------
+2026-10-03 10:34:41.796 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - [FMMP] Ejecución 03/10/2026 10:34:41
+2026-10-03 10:34:41.796 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------
+2026-10-03 10:42:13.573 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------
+2026-10-03 10:42:13.574 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - [FMMP] Ejecución 03/10/2026 10:42:13
+2026-10-03 10:42:13.575 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------
+2026-10-03 10:42:40.113 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------
+2026-10-03 10:42:40.114 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - [FMMP] Ejecución 03/10/2026 10:42:40
+2026-10-03 10:42:40.115 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------
+2026-10-03 10:42:52.715 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------
+2026-10-03 10:42:52.717 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - [FMMP] Ejecución 03/10/2026 10:42:52
+2026-10-03 10:42:52.717 [Test worker] ERROR o.f.b.scraper.BibliaScraperTest2 - ------------------------------------

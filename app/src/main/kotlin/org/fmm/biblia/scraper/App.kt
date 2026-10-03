@@ -23,7 +23,7 @@ class App {
             url = "libro01gn.html"
             )
 
-        val documento = BibliaScraper.downloadAndParseURLBook(
+        val documento = BibliaScraper.obtainAndParseURLBook(
 //            idDoc = "LIB_GN",
             libroDto = libroDto,
             urlBase = urlBase,

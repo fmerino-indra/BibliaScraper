@@ -1,5 +1,6 @@
 package org.fmm.biblia.scraper
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.fmm.biblia.scraper.data.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -10,8 +11,10 @@ import org.jsoup.select.Elements
 import java.io.File
 import kotlinx.serialization.json.Json
 import org.fmm.biblia.scraper.data.dto.LibroDto
+import org.fmmp.biblia.scraper.utils.RecursosUtils
 
 object BibliaScraper {
+    private val logger = KotlinLogging.logger {}
 
     fun buildVersiculoId(capitulo: Int, numero: Int): String {
         return "ver_${capitulo}_$numero"
@@ -25,24 +28,59 @@ object BibliaScraper {
     }
 
     // 2. Descarga y limpia la página objetivo
-    private fun descargarYLimpiar(url: String): Document {
-        val respuesta = Jsoup.connect(url)
-            .userAgent("Mozilla/5.0 (X11; Fedora; Linux x86_64)")
-            .timeout(100_000)
-            .execute()
+    private fun obtenerHtmlYLimpiar(uriBase: String, uriFichero: String, descargar: Boolean=true ): Document {
+        val url = uriBase + uriFichero
+        if (descargar) {
+            val respuesta = Jsoup.connect(url)
+//            .userAgent("Mozilla/5.0 (X11; Fedora; Linux x86_64)")
+                .userAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36")
+                .header(
+                    "Accept",
+                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+                )
+                .header("Accept-Language", "es-ES,es;q=0.9,en;q=0.8")
+                .header("Referer", "https://www.edesclee.com/content/309-biblia-online-ed")
+//            .header("Connection", "keep-alive")
+                .header("Upgrade-Insecure-Requests", "1")
+                .header("Sec-Fetch-Dest", "document")
+                .header("Sec-Fetch-Mode", "navigate")
+                .header("Sec-Fetch-Site", "none")
+                .header("Sec-Fetch-User", "?1")
 
-        val htmlSanitizado = sanitizarHtml(respuesta.body())
-        return Jsoup.parse(htmlSanitizado, url)
+                .header("Sec-Ch-Ua", "\"Google Chrome\";v=\"153\", \"Not_A Brand\";v=\"8\", \"Chromium\";v=\"153\"")
+                .header("Sec-Ch-Ua-Mobile", "?0")
+                .header("Sec-Ch-Ua-Platform", "\"Linux\"")
+                .cookie("anubis-cookie-cookie-verification", "01a0ec5a-1fb9-70e5-9704-13b5dbc3ba85")
+                .cookie(
+                    "anubis-cookie-auth",
+                    "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhY3Rpb24iOiJDSEFMTEVOR0UiLCJjaGFsbGVuZ2UiOiIwMWEwZWM1YS0xZmI5LTcwZTUtOTcwNC0xM2I1ZGJjM2JhODUiLCJleHAiOjE3OTEyNzY1MjQsImlhdCI6MTc5MDY3MTcyNCwibWV0aG9kIjoiZmFzdCIsIm5iZiI6MTc5MDY3MTY2NCwicG9saWN5UnVsZSI6ImFjOTgwZjQ5YzRkMzVmYWIiLCJyZXN0cmljdGlvbiI6IjE1OTU2OGExNWMxZmUxMzc1ZDBjMTRmNDZlNThlY2ZlOTY5MzMwOGYyNjg5OWZjMTY3NmNjMmRiMWU1MTI2NTEifQ.zli9evv_MwrEMTqTAt3YQZiqgKH7weFy70qCBjqIY5_KTgpL20NFeq2T9j1v3dn4Uq0CuB7RALajHBGCI8MDDQ"
+                )
+                .timeout(100_000)
+                .execute()
+            val bodyResponse = respuesta.body()
+            guardarHtmlOriginal(ruta = "html-original", nombreFichero = uriFichero, content = bodyResponse)
+            val htmlSanitizado = sanitizarHtml(bodyResponse)
+            return Jsoup.parse(htmlSanitizado, url)
+        } else {
+            val content = RecursosUtils.leerFicheroComoTexto(rutaArchivo=uriBase, archivo = uriFichero)
+            val htmlSanitizado = sanitizarHtml(content)
+            return Jsoup.parse(htmlSanitizado, url)
+        }
+
     }
 
     // 3. Orquestador del parseo
-    fun downloadAndParseURLBook(
+    fun obtainAndParseURLBook(
         libroDto: LibroDto,
         urlBase: String,
-        urlNotas: String? = null
+        urlNotas: String? = null,
+        descargar: Boolean = false,
     ): DocumentoBiblico {
 
-        val docHtml = descargarYLimpiar(urlBase + libroDto.url)
+        logger.debug { "[FMMP] obtainAndParseURLBook: ${libroDto.es}" }
+        logger.debug { "[FMMP] Descargar: $descargar" }
+
+        val docHtml = obtenerHtmlYLimpiar(uriBase = urlBase, uriFichero = libroDto.url, false)
         val seccionesIntro = parsearSeccionesIntroduccion(docHtml)
         val caps = parsearHTMLDocument(docHtml)
 
@@ -91,7 +129,7 @@ object BibliaScraper {
                     val nivel = elem.tagName().removePrefix("h").toIntOrNull() ?: 1
                     val titulo = parsearEncabezado(elem, ctx.numCapituloActual, ctx.titulosPendientes.size + 1, nivel)
 
-                    if (ctx.numVersiculoActual != -1) {
+                    if (ctx.numVersiculoActual != "-1") {
                         // Si hay un versículo en curso, el título forma parte de su contenido directo
                         // Lo de antes puede ser verdad o bien, si el vers. ha terminado, debe preceder al siguiente versículo o capítulo.
                         ctx.titulosPendientes.add(titulo)
@@ -132,7 +170,7 @@ object BibliaScraper {
         }
 
         // Notificación de fin de párrafo para el versículo en construcción
-        if (ctx.numVersiculoActual != -1 && ctx.contenidoVersiculoActual.isNotEmpty()) {
+        if (ctx.numVersiculoActual != "-1" && ctx.contenidoVersiculoActual.isNotEmpty()) {
             ctx.notificarFinDeParrafo()
         }
     }
@@ -146,10 +184,9 @@ object BibliaScraper {
                     // Marcador de versículo: Punto de corte y consolidación
                     tag == "sup" && nodo.id().startsWith("v") -> {
                         // Cualquier caracter que no sea un dígito lo reemplaza por "" (cadena vacía)
-                        val numNuevoVer = nodo.text().replace(Regex("[^0-9]"), "").toIntOrNull() ?: -1
+//                        val numNuevoVer = nodo.text().replace(Regex("[^0-9]"), "").toIntOrNull() ?: -1
+                        val numNuevoVer: String = nodo.text().replace(Regex("[^0-9a-z]"), "")
                         ctx.consolidarVersiculo()
-//                        ctx.consolidarVersiculo(titulosAInyectar = ctx.titulosPendientes.toList())
-//                        ctx.titulosPendientes.clear()
 
                         ctx.numVersiculoActual = numNuevoVer
                         return
@@ -159,7 +196,7 @@ object BibliaScraper {
                     isTagNota(nodo, tag) -> {
                         val nota = extraerYRegistrarNota(nodo, tag, ctx.numCapituloActual, ctx.notasPendientes)
                         if (nota != null) {
-                            if (ctx.numVersiculoActual == -1) {
+                            if (ctx.numVersiculoActual == "-1") {
                                 ctx.capitulosHash[ctx.numCapituloActual]?.llamadasNotas?.add(nota)
                             } else {
                                 ctx.contenidoVersiculoActual.add(nota)
@@ -292,5 +329,9 @@ object BibliaScraper {
         archivo.writeText(jsonString, Charsets.UTF_8)
 
         println("✅ Estructura exportada con éxito a: ${archivo.absolutePath}")
+    }
+
+    private fun guardarHtmlOriginal(ruta: String, nombreFichero: String, content: String) {
+        RecursosUtils.guardarHtmlOriginal(ruta, nombreFichero, content)
     }
 }

@@ -7,14 +7,11 @@ class ContextoParseo {
 
     // === ESTADO DE CAPÍTULOS ===
     var numCapituloActual: Int = 1
-    var capituloPendiente: Capitulo? = null
-    val capitulos = mutableListOf<Capitulo>()
     val capitulosHash = mutableMapOf<Int, Capitulo>()
     val versiculosAcumulados = mutableListOf<Versiculo>()
 
     // === ESTADO DE VERSÍCULO EN CONSTRUCCIÓN ===
-    var numVersiculoActual: Int = -1
-//    var idHtmlVerActual: String = ""
+    var numVersiculoActual: String = "-1"
     val contenidoVersiculoActual = mutableListOf<IElementoVersiculo>()
     val paralelosVersiculoActual = mutableListOf<Paralelo>()
 
@@ -29,7 +26,7 @@ class ContextoParseo {
      *                          anteponerse como contenido de este versículo.
      */
     fun consolidarVersiculo(titulosAInyectar: List<Titulo> = emptyList()) {
-        if (numVersiculoActual != -1 || contenidoVersiculoActual.isNotEmpty()) {
+        if (numVersiculoActual != "-1" || contenidoVersiculoActual.isNotEmpty()) {
             val contenidoFinal = mutableListOf<IElementoVersiculo>()
 
             // 1. Añadimos el contenido propio del versículo acumulado hasta este punto
@@ -57,7 +54,7 @@ class ContextoParseo {
             // 5. Reiniciamos el estado del versículo activo
             contenidoVersiculoActual.clear()
             paralelosVersiculoActual.clear()
-            numVersiculoActual = -1
+            numVersiculoActual = "-1"
 //            idHtmlVerActual = ""
         }
     }

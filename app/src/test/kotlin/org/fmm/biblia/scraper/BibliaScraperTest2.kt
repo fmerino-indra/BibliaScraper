@@ -8,12 +8,19 @@ import org.fmm.biblia.scraper.data.DocumentoBiblico
 import org.fmm.biblia.scraper.data.dto.LibroDto
 import org.fmmp.biblia.scraper.utils.RecursosUtils
 import org.junit.jupiter.api.BeforeEach
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class BibliaScraperTest2 {
+    private val rutaValidaciones = "validaciones-json-v2"
+    val rutaHtml = "html-original"
+
     private val logger = KotlinLogging.logger {}
+    private val descargar = false
 
     private lateinit var masterLibros: List<LibroDto>
     private lateinit var validaciones: Map<String,Map<String, Int>>
+
     // 1. URL de la fuente (Sustitúyela por la URL real de tu scraper)
     val urlBiblia = "https://www.edesclee.com/bibliaonline/content/"
 
@@ -25,16 +32,23 @@ class BibliaScraperTest2 {
 
     @Test
     fun `deberia descargar y parsear capitulos reales cuadrando con los conteos oficiales`() {
+        logger.error { "------------------------------------" }
+        logger.error { "[FMMP] Ejecución ${LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))}" }
+        logger.error { "------------------------------------" }
 
         // 2. Convertimos a mapa
         val mapaLibrosPorId: Map<Int, LibroDto> = masterLibros.associateBy { it.id }
-        println(buildPageName(1,"Gn"))
+        //println(buildPageName(1,"Gn"))
         // 3. Recorremos mapa.
         mapaLibrosPorId.forEach { (key, value) ->
             val documento = buildBook(key,value)
             val versiculosEsperados: Map<String, Int> = validaciones[value.esKey] ?:emptyMap()
-            verificarIntegridad(documento = documento, numCapitulosEsperados = value.chapters, versiculosEsperados = versiculosEsperados)
-            guardarJson(documento)
+            val errores = verificarIntegridad(documento = documento, numCapitulosEsperados = value.chapters, versiculosEsperados = versiculosEsperados, value)
+            errores.forEach { key, value ->
+                if (value.isNotEmpty())
+                    logger.error { "$key: $value" }
+            }
+//            guardarJson(documento)
         }
         // ==========================================
         // VALIDACIÓN CONTRA LA TABLA DE CONTROL
@@ -52,6 +66,8 @@ class BibliaScraperTest2 {
 
     private fun buildBook(key: Int, libroDto: LibroDto):DocumentoBiblico {
         val aux = "Key: $key -> ${libroDto.es} | ${libroDto.esKey}"
+        println()
+        println()
         println(aux)
         logger.debug {aux}
         // a) Descarga html libro
@@ -63,7 +79,11 @@ class BibliaScraperTest2 {
          */
 
         // a) Descargar y parsear el libro
-        val book=BibliaScraper.downloadAndParseURLBook(libroDto = libroDto, urlBase = urlBiblia)
+
+        val book=if (descargar)
+            BibliaScraper.obtainAndParseURLBook(libroDto = libroDto, urlBase = urlBiblia, descargar = true)
+        else
+            BibliaScraper.obtainAndParseURLBook(libroDto = libroDto, urlBase = rutaHtml, descargar = false)
         return book
         //val capitulosParseados = BibliaScraper.parsearHTMLDocument(libroDoc)
         //println(capitulosParseados)
@@ -73,7 +93,8 @@ class BibliaScraperTest2 {
     private fun leerLibros():List<LibroDto> {
         val fileName = "bible-books.json"
 
-        val jsonString = RecursosUtils.leerRecursoComoTexto(fileName)
+//        val jsonString = RecursosUtils.leerRecursoComoTexto(fileName)
+        val jsonString = RecursosUtils.leerFicheroComoTexto(rutaArchivo = rutaValidaciones, fileName)
         return Json.decodeFromString<List<LibroDto>>(jsonString)
     }
 
@@ -84,25 +105,30 @@ class BibliaScraperTest2 {
     private fun leerValidacionesVersiculos():Map<String,Map<String, Int>> {
         val fileName = "bible-chapters.json"
 
-        val jsonString = RecursosUtils.leerRecursoComoTexto(fileName)
+        //val jsonString = RecursosUtils.leerRecursoComoTexto(fileName)
+        val jsonString = RecursosUtils.leerFicheroComoTexto(rutaArchivo = rutaValidaciones, fileName)
         val aux = Json.decodeFromString<Map<String,Map<String, Int>>>(jsonString)
         return aux
     }
 
-    private fun verificarIntegridad(documento: DocumentoBiblico, numCapitulosEsperados: Int, versiculosEsperados: Map<String, Int>) {
+    private fun verificarIntegridad(documento: DocumentoBiblico, numCapitulosEsperados: Int, versiculosEsperados: Map<String, Int>, libroDto: LibroDto): Map<String, List<Int>> {
+        val errores: MutableMap<String, List<Int>> = mutableMapOf() // genesis: [3, 47, ...]
+        val listaCapitulosError: MutableList<Int> = mutableListOf()
         val capitulosParseados: Map<Int, Capitulo> = documento.capitulosLibro
 
         val caps = numCapitulosEsperados == capitulosParseados.size
         if (!caps) {
             println("❌ ERROR: Capítulos mal parseados: esperados: $numCapitulosEsperados vs parseados: ${capitulosParseados.size}")
-            return
+            return errores
         }
         var erroresNum = 0
+
         for (i in 1.. numCapitulosEsperados) {
+
             val existe =capitulosParseados[i] != null
             if (!existe) {
                 println("❌ ERROR en Cap $i: NO EXISTE")
-                return
+                return errores
             }
             val cap = capitulosParseados[i]
 
@@ -114,10 +140,13 @@ class BibliaScraperTest2 {
             } else {
                 erroresNum++
                 println("❌ ERROR en Cap $i: Esperados $esperados, pero el algoritmo contó ${cap?.versiculos?.size?:0}.")
+
+                listaCapitulosError.add(cap?.numero?:-1)
             }
         }
+        errores[libroDto.esKey] = listaCapitulosError
         println("[FMMP] ${documento.titulo} -> $erroresNum Errores ")
-
+        return errores
     }
     private fun buildPageName(id:Int, key:String):String {
 // <9 ==

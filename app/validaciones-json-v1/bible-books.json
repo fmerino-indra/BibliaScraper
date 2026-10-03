@@ -82,7 +82,7 @@
   {
     "id": 9,
     "orden": 9,
-    "esKey": "primer_libro_de_samuel",
+    "esKey": "1samuel",
     "es": "Primer libro de Samuel",
     "abbr": "1 S",
     "testament": "old",
@@ -92,7 +92,7 @@
   {
     "id": 10,
     "orden": 10,
-    "esKey": "segundo_libro_de_samuel",
+    "esKey": "2samuel",
     "es": "Segundo libro de Samuel",
     "abbr": "2 S",
     "testament": "old",
@@ -102,7 +102,7 @@
   {
     "id": 11,
     "orden": 11,
-    "esKey": "primer_libro_de_los_reyes",
+    "esKey": "1reyes",
     "es": "Primer libro de los Reyes",
     "abbr": "1 R",
     "testament": "old",
@@ -112,7 +112,7 @@
   {
     "id": 12,
     "orden": 12,
-    "esKey": "segundo_libro_de_los_reyes",
+    "esKey": "2reyes",
     "es": "Segundo libro de los Reyes",
     "abbr": "2 R",
     "testament": "old",
@@ -122,7 +122,7 @@
   {
     "id": 13,
     "orden": 13,
-    "esKey": "primer_libro_de_cronicas",
+    "esKey": "1cronicas",
     "es": "Primer libro de las Crónicas",
     "abbr": "1 Cro",
     "testament": "old",
@@ -132,7 +132,7 @@
   {
     "id": 14,
     "orden": 14,
-    "esKey": "segundo_libro_de_cronicas",
+    "esKey": "2cronicas",
     "es": "Segundo libro de las Crónicas",
     "abbr": "2 Cro",
     "testament": "old",
@@ -192,7 +192,7 @@
   {
     "id": 20,
     "orden": 20,
-    "esKey": "primer_libro_de_los_macabeos",
+    "esKey": "1macabeos",
     "es": "Primer libro de los Macabeos",
     "abbr": "1 M",
     "testament": "old",
@@ -202,7 +202,7 @@
   {
     "id": 21,
     "orden": 21,
-    "esKey": "segundo_libro_de_los_macabeos",
+    "esKey": "2macabeos",
     "es": "Segundo libro de los Macabeos",
     "abbr": "2 M",
     "testament": "old",

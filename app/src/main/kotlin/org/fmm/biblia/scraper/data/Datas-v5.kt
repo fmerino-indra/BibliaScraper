@@ -71,7 +71,7 @@ data class Versiculo(
     override val id: String,
 //    override val idHtml: String? = null,
     val capitulo: Int,
-    val numero: Int,
+    val numero: String,
     val esPoesia: Boolean = false,                         // Complemento: indicador de formato poético
     override val llamadasNotas: List<NotaAlPie> = mutableListOf(),
     override val titulosPrevios: List<Titulo> = emptyList(),       // Complemento: perícopas intermedias
@@ -83,7 +83,7 @@ data class Versiculo(
         id: String,
 //        idHtml: String? = null,
         capitulo: Int,
-        numero: Int,
+        numero: String,
         esPoesia: Boolean = false,                         // Complemento: indicador de formato poético
         llamadasNotas: List<NotaAlPie> = mutableListOf(),
         titulosPrevios: List<Titulo> = emptyList(),       // Complemento: perícopas intermedias
@@ -105,7 +105,7 @@ data class Versiculo(
         id: String,
 //        idHtml: String? = null,
         capitulo: Int,
-        numero: Int,
+        numero: String,
         esPoesia: Boolean = false,                         // Complemento: indicador de formato poético
         llamadasNotas: List<NotaAlPie> = mutableListOf(),
         titulosPrevios: List<Titulo> = emptyList(),       // Complemento: perícopas intermedias
