@@ -3,3 +3,43 @@ Jos 3: 18 versículos: 4b y 4a
 Jc 13: 26 versículos: 6b y 6a
 1S 11: 16 versículos: Comienza el capítulo pero no hay marca de versículo. Aparece palabras después.
 2S 16: 45 versículos: 12b y 12a
+1R 4: Super-raro, 4, termina sin el v. 20. Comienza el 5 y de repente 4,20
+1R 11: 44 versículos: 25a y 25b
+1R 15: 34 versículos: hay 2 números de versículo entre paréntesis.
+1Cr 3: 24 versículos: Simplemente
+Nh 8: ????? Super-raro -> No solucionado similar a 1S 11
+Nh 10: 41 versículos: 40ab y 40c
+Nh 12: 48 versículos: 7a y 7b
+
+Ester: Adiciones a Ester (A,B,C,D,E y F)
+Est 1: Hay 2 capítulos 1, Adic. A: 1a, 1b, 1c, 1d, 1e, 1f, 1g, 1h, 1i, 1k, 1l, 1m, 1n, 1o, 1p, 1q, 1r + 22 = 17 + 22 = 39
+Est 3: Adición B: 13a, 13b, 13c, 13d, 13e, 13f, 13g  + 15 = 22
+Est 4: Adición C: 17a, 17b, 17c, 17d, 17e, 17f, 17g, 17h, 17i, 17k, 17l, 17m, 17n, 17o, 17p, 17q, 17r, 17s, 17t, 17u, 17v, 17, 17x, 17y, 17z + 17 = 25 + 17 = 42
+Est 5: Adic. D y E: 1a, 1b, 1c, 1d, 1e, 1f, 2a, 2b + 14 = 8 + 14 = 22 => 21, porque falta el 1
+Est 8: Adic. E: 12a, 12b, 12c, 12d, 12e, 12f, 12g, 12h, 12i, 12k, 12l, 12m, 12n, 12o, 12p, 12q, 12r, 12s, 12t, 12u, 12v + 17 = 21 + 17 = 38
+Est 9: 33 versículos: 19a. 
+Est 10: Adic. F: 3a, 3b, 3c, 3d, 3e, 3f, 3g, 3h, 3i, 3k, 3l + 3 = 11 + 3 = 14
+1Mac 14: 51 versículos: 14b y 14c
+Is 8: 25 versículos: 18a, 18b, 20a, 20b (pero faltan 18 y 20)
+Jr 5: 33 versículos: 13a, 13b, 14a, 14b (pero faltan 13 y 14). Además, genera un versículo más porque hay dos: <sup id="v0513" class="ddb17">13</sup><sup id="v0513" class="ddb17">a</sup>
+Lm 2: 22 versículos.
+Ez 40: 49 versículos.
+Na 3: 21 versículos: 16a, 16b, 17a, 17b (faltan 16 y 17)
+Ag 2: Similar a Nh 8, versículo sin número tras número de capítulo. No solucionado.
+Za 3: 12 versículos: 4a, 4b, 4c (falta 4)
+Za 4: 16 versículos: 6a, 6b, 10a, 10b (faltan 6 y 10)
+Za 12: 15 versículos: 2a, 2b (falta 2)
+
+Mt 17: 27 versículos. El versículo 21 aparece así: [21] Copia medieval de Mc 9,29. Omisión textual.
+Mt 18: 35 versículos. [11] Lc 19, 10
+Mt 21: 46 versículos.
+Mt 23: 39 versículos. [14] Mc 12, 40 y Lc 20, 47
+Mc 9: 50 versículos. [44][46] Copista repitió Mc 9, 48 para darle tono repetitivo.
+Mc 11: 33 versículos. [26] Mt 6, 15
+Mc 15: 47 versículos. [28] Lc 22, 27
+Lc 17: 37 versículos. [36] Mt 24, 40
+Lc 23: 56 versículos. [17] Mt 27, 15 y Mc 15, 6
+Jn 5, 15: 46 versículos. Falta el v. 15 en la edición digital. Aunque el texto está añadido al 14.
+
+Versículos desdoblados (1a, 1b, etc.): Muchos
+Versículos del capítulo anterior, después del número de capítulo siguiente: 1S 11 Nh 8

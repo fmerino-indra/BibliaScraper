@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter
 
 class BibliaScraperTest2 {
     private val rutaValidaciones = "validaciones-json-v2"
-    val rutaHtml = "html-original"
+    val rutaHtml = "html-original/libros"
 
     private val logger = KotlinLogging.logger {}
     private val descargar = false

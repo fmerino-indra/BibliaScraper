@@ -112,8 +112,9 @@ object BibliaScraper {
 
         parsearHTMLElements(elementos, indexInicio, contexto)
 
-        // Cierre final del árbol procesado
-        contexto.consolidarCapitulo(numCapDetectado = contexto.numCapituloActual)
+        // Cierre final del árbol procesado. Se envía -1 porque realmente no se ha detectado ninguno
+        contexto.consolidarCapitulo(numCapDetectado = -1)
+//        contexto.consolidarCapitulo(numCapDetectado = contexto.numCapituloActual)
 
 //        return contexto.capitulos.associateBy { capitulo -> capitulo.numero }
         return contexto.capitulosHash
@@ -298,7 +299,9 @@ object BibliaScraper {
     }
 
     private fun isTagParalelo(elem: Element, tag: String): Boolean {
-        return tag.startsWith("href") || (tag == "span" && elem.attr("data-type") == "href")
+        return tag.startsWith("href")
+                || (tag == "span" && elem.attr("data-type") == "href")
+//                || (tag == "a")
     }
 
     private fun extraerYRegistrarNota(elem: Element, tag: String, capitulo: Int, buffer: MutableList<NotaAlPie>): NotaAlPie? {

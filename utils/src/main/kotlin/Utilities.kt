@@ -71,6 +71,7 @@ object RecursosUtils {
 
     fun guardarHtmlOriginal(rutaArchivo: String, nombreFichero: String, content: String) {
         val archivo = File(rutaArchivo, nombreFichero)
+        archivo.parentFile?.mkdirs()
         archivo.writeText(content, Charsets.UTF_8)
         println("✅ Estructura exportada con éxito a: ${archivo.absolutePath}")
     }

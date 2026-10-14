@@ -16,6 +16,7 @@ import org.fmm.biblia.scraper.data.dto.TipoTestamento
 data class LibroDto (
     val id: Int,
     val orden: Int,
+    val ordenStandard: Int=0,
     val esKey: String,
     val es:String,
     val abbr: String,
@@ -23,34 +24,4 @@ data class LibroDto (
     val chapters: Int,
     val url:String=""
 )
-
-/*
-object LibroDtoListSerializer : KSerializer<LibroDto> {
-//    private val delegateSerializer = ListSerializer(LibroDto.serializer())
-    private val delegateSerializer = JsonObject.serializer()
-
-    override val descriptor: SerialDescriptor
-        get() = delegateSerializer.descriptor
-
-    override fun serialize(encoder: Encoder,value: LibroDto) {
-        throw UnsupportedOperationException("Readable only")
-    }
-
-    override fun deserialize(decoder: Decoder): LibroDto {
-        // Se realiza el cast a JsonDecoder para poder leer el JsonElement
-        val jsonDecoder = decoder as JsonDecoder
-            ?: throw IllegalStateException("JSON deserialization not supported")
-
-//        val rootObject = Json.decodeFromJsonElement(
-//            delegateSerializer,
-//            decoder.decodeJsonElement()) as JsonObject
-        val rootObject = jsonDecoder.decodeJsonElement().jsonObject
-
-        return rootObject.map { (id, esKey , es, abbr, enKey, en, enAbbr, testament, chapters, url ) ->
-
-
-        }
-    }
-}
- */
 

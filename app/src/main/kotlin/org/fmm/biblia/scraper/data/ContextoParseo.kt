@@ -6,7 +6,7 @@ package org.fmm.biblia.scraper.data
 class ContextoParseo {
 
     // === ESTADO DE CAPÍTULOS ===
-    var numCapituloActual: Int = 1
+    var numCapituloActual: Int = -1
     val capitulosHash = mutableMapOf<Int, Capitulo>()
     val versiculosAcumulados = mutableListOf<Versiculo>()
 
@@ -60,16 +60,85 @@ class ContextoParseo {
     }
 
     /**
-     * Consocida y empaqueta el capítulo en curso.
+     * Consolida y empaqueta el capítulo en curso.
      *
      * @param numCapDetectado Número del nuevo capítulo detectado al que se va a hacer la transición.
+     *
      */
     fun consolidarCapitulo(numCapDetectado: Int) {
+
+
         // 1. Consolidamos primero el versículo que pudiera haber estado abierto en el capítulo anterior
         //    No le enviamos títulos pendientes, por lo que seguirán pendientes y se añadirán al capítulo
         consolidarVersiculo()
 
-        // En este punto:
+        // 2. En este punto:
+        // a) si hay versículos claramente son del capítulo anterior.
+        // b) si hay títulos claramente son del capítulo nuevo
+        // masterLibros.associateBy { it.id } -> Sólo para acordarme de la sintaxis
+        // masterLibros.associateByTo(mapa) { it.id }
+
+        // Caso 3: Última llamada, realmente se hace para introducir los últimos versículos
+
+        if (numCapDetectado == -1) {
+            val capActual = capitulosHash[numCapituloActual]
+            if (capActual != null) {
+                if (versiculosAcumulados.isNotEmpty()) {
+                    println("[FMMP] - WARNING. Último capítulo. El número de capitulo: $numCapituloActual tiene versículos sin añadir.")
+                    capActual.versiculos.addAll(versiculosAcumulados)
+                }
+                return
+            }
+        }
+
+        // 1º Capítuo del libro
+        if (numCapituloActual == -1) {
+            val cap = Capitulo(
+                id = "cap_${numCapDetectado}",
+                numero = numCapDetectado,
+                titulosPrevios = titulosPendientes.toMutableList()
+            )
+            capitulosHash[cap.numero] = cap
+            titulosPendientes.clear()
+            numCapituloActual = numCapDetectado
+            return
+        }
+        val capActual = capitulosHash[numCapituloActual]
+
+        // Añadir los versiculosAcumulados al capítulo actual.
+        if (versiculosAcumulados.isNotEmpty()) {
+            capActual?.versiculos?.addAll(versiculosAcumulados)
+            versiculosAcumulados.clear()
+        } // Dejamos ya el capActual
+
+        var capDetectado = capitulosHash[numCapDetectado]
+        if (capDetectado == null) {
+            capDetectado = Capitulo(
+              id = "cap_${numCapDetectado}",
+              numero = numCapDetectado,
+              titulosPrevios = titulosPendientes.toMutableList()
+            )
+            titulosPendientes.clear()
+            capitulosHash[capDetectado.numero] = capDetectado
+        } // Si es diferente de null, no hay que hacer nada, pero se deja como actual
+        // 3. Actualizamos el número de capítulo activo
+        numCapituloActual = numCapDetectado
+    }
+
+    /**
+     * Consolida y empaqueta el capítulo en curso.
+     *
+     * @param numCapDetectado Número del nuevo capítulo detectado al que se va a hacer la transición.
+     *
+     */
+    fun consolidarCapituloOld(numCapDetectado: Int) {
+
+
+        // 1. Consolidamos primero el versículo que pudiera haber estado abierto en el capítulo anterior
+        //    No le enviamos títulos pendientes, por lo que seguirán pendientes y se añadirán al capítulo
+        consolidarVersiculo()
+
+        // 2. En este punto:
         // a) si hay versículos claramente son del capítulo anterior.
         // b) si hay títulos claramente son del capítulo nuevo
         // masterLibros.associateBy { it.id } -> Sólo para acordarme de la sintaxis
@@ -111,34 +180,6 @@ class ContextoParseo {
         capitulosHash[cap.numero] = cap
         versiculosAcumulados.clear()
         titulosPendientes.clear()
-
-        // 2. Si se han acumulado versículos o títulos para el capítulo actual, se crea e instancia
-        // [FMMP] No estoy tan seguro de que acumular titulosPendientes obligue a crear capítulo.
-        /*
-        if (versiculosAcumulados.isNotEmpty() || titulosPendientes.isNotEmpty()) {
-            if (capituloPendiente == null) {
-                capituloPendiente = Capitulo(
-                    id = "cap_${numCapituloActual}",
-                    numero = numCapituloActual,
-                    titulosPrevios = titulosPendientes.toMutableList(),
-                    versiculos = versiculosAcumulados.toMutableList()
-                )
-            } else {
-                capitulos.add(capituloPendiente!!)
-                capituloPendiente = Capitulo(
-                    id = "cap_${numCapituloActual}",
-                    numero = numCapituloActual,
-                    titulosPrevios = titulosPendientes.toMutableList(),
-                    versiculos = versiculosAcumulados.toMutableList()
-                )
-            }
-
-            // Reseteamos las listas temporales del capítulo
-            versiculosAcumulados.clear()
-            titulosPendientes.clear()
-        }
-
-         */
 
         // 3. Actualizamos el número de capítulo activo
         numCapituloActual = numCapDetectado
