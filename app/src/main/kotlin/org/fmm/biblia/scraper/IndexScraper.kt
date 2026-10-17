@@ -47,7 +47,7 @@ object IndexScraper {
                 .execute()
             val bodyResponse = respuesta.body()
             return bodyResponse
-        } else {
+        } else { // descargar
             // Leer
             return ""
         }

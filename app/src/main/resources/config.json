@@ -1,0 +1,21 @@
+{
+    "remote": {
+      "uriBiblia": "https://www.edesclee.com/bibliaonline/content/",
+      "index": "index-hebrea.html"
+    },
+    "local": {
+      "uriBiblia": "html-original-v2",
+      "index": "index-base.html"
+    },
+    "rutas": {
+      "rutaValidaciones": "validaciones-json-v2"
+    },
+    "files": {
+      "bible-books": "bible-books.json",
+      "bible-chapters": "bible-chapters.json",
+      "uriLibros": "libros",
+      "uriTextos": "textos",
+      "librosDto": "librosDto.json",
+      "textosDto": "textosDto.json"
+    }
+}
