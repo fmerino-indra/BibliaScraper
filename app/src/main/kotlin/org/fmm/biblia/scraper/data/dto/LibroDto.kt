@@ -1,6 +1,7 @@
 package org.fmm.biblia.scraper.data.dto
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -13,15 +14,16 @@ import kotlinx.serialization.json.jsonObject
 import org.fmm.biblia.scraper.data.dto.TipoTestamento
 
 @Serializable
+@SerialName("libros")
 data class LibroDto (
-    val id: Int,
-    val orden: Int,
+    override val id: Int,
+    override val orden: Int,
     val ordenStandard: Int=0,
     val esKey: String,
-    val es:String,
+    override val es:String,
     val abbr: String,
-    val testament: TipoTestamento,
+    override val testament: TipoTestamento,
     val chapters: Int,
-    val url:String=""
-)
+    override val url:String=""
+): IndexBaseDto
 

@@ -1,21 +1,29 @@
 {
     "remote": {
       "uriBiblia": "https://www.edesclee.com/bibliaonline/content/",
-      "index": "index-hebrea.html"
+      "index": "indice-hebrea.html"
     },
     "local": {
-      "uriBiblia": "html-original-v2",
+      "uriBiblia": "files/html-original-v2",
       "index": "index-base.html"
     },
     "rutas": {
-      "rutaValidaciones": "validaciones-json-v2"
+      "rutaBase": "files",
+      "rutaValidaciones": "files/validaciones-json-v2",
+      "rutaHtml": "files/html-original-v2",
+      "rutaBibliaJson": "biblia-json"
     },
     "files": {
-      "bible-books": "bible-books.json",
-      "bible-chapters": "bible-chapters.json",
       "uriLibros": "libros",
       "uriTextos": "textos",
+      "bible-books": "bible-books.json",
+      "bible-chapters": "bible-chapters.json",
       "librosDto": "librosDto.json",
-      "textosDto": "textosDto.json"
+      "textosDto": "textosDto.json",
+      "baseIndexDto": "baseIndexDto.json"
+    },
+    "security": {
+      "anubis-cookie-cookie-verification": "01a142f7-3cd4-7403-a533-8ab25c8e7612",
+      "anubis-cookie-auth": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhY3Rpb24iOiJDSEFMTEVOR0UiLCJjaGFsbGVuZ2UiOiIwMWExNDJmNy0zY2Q0LTc0MDMtYTUzMy04YWIyNWM4ZTc2MTIiLCJleHAiOjE3OTI3Mjk2NjIsImlhdCI6MTc5MjEyNDg2MiwibWV0aG9kIjoiZmFzdCIsIm5iZiI6MTc5MjEyNDgwMiwicG9saWN5UnVsZSI6ImFjOTgwZjQ5YzRkMzVmYWIiLCJyZXN0cmljdGlvbiI6IjE1OTU2OGExNWMxZmUxMzc1ZDBjMTRmNDZlNThlY2ZlOTY5MzMwOGYyNjg5OWZjMTY3NmNjMmRiMWU1MTI2NTEifQ.vQCjnVN_D7biNhcHqz1SwmeMPi1f83J9MiLGESGQRIIqA7r4QWVA84kAbq20XwQmJ0Ljt2fD53LEi9pZNeJICg"
     }
 }

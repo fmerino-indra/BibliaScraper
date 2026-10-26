@@ -8,7 +8,6 @@ import kotlinx.serialization.json.Json
 import java.io.File
 import kotlin.time.ExperimentalTime
 import java.io.InputStream
-import java.io.OutputStream
 
 @Serializable
 class Printer(val message: String) {
@@ -54,19 +53,28 @@ object RecursosUtils {
         return archivo.readText()
     }
 
-    inline fun <reified T> guardarDocumentoBiblicoJson(json: T, rutaArchivo: String) {
+    inline fun <reified T> guardarDocumentoBiblicoJson(json: T, fileString: String) {
+        val archivo = File(fileString)
+        guardarDocumentoBiblicoJson(json, archivo)
+    }
+
+    inline fun <reified T> guardarDocumentoBiblicoJson(json: T, fileDir: String, fileName: String) {
+        guardarDocumentoBiblicoJson(json, File(fileDir, fileName))
+    }
+    inline fun <reified T> guardarDocumentoBiblicoJson(json: T, file: File) {
         val jsonConfig = Json {
             prettyPrint = true
             ignoreUnknownKeys = true
         }
+        file.parentFile.mkdirs()
 
         val jsonString = jsonConfig.encodeToString(json)
 
 
-        val archivo = File(rutaArchivo)
-        archivo.writeText(jsonString, Charsets.UTF_8)
+        //val archivo = File(rutaArchivo)
+        file.writeText(jsonString, Charsets.UTF_8)
 
-        println("✅ Estructura exportada con éxito a: ${archivo.absolutePath}")
+        println("✅ Estructura exportada con éxito a: ${file.absolutePath}")
     }
 
     fun guardarHtmlOriginal(rutaArchivo: String, nombreFichero: String, content: String) {

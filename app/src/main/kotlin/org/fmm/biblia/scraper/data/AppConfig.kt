@@ -8,8 +8,19 @@ data class AppConfig(
     val remote: RemoteConfig,
     val local: LocalConfig,
     val rutas: RutasConfig,
-    val files: FilesConfig
+    val files: FilesConfig,
+    val security: SecurityConfig
 )
+
+@Serializable
+data class SecurityConfig(
+    @SerialName("anubis-cookie-cookie-verification")
+    val anubisCookieCookieVerification: String,
+    @SerialName("anubis-cookie-auth")
+    val anubisCookieAuth: String
+) {
+
+}
 
 @Serializable
 data class RemoteConfig(
@@ -25,7 +36,10 @@ data class LocalConfig(
 
 @Serializable
 data class RutasConfig(
-    val rutaValidaciones: String
+    val rutaBase:String,
+    val rutaValidaciones: String,
+    val rutaHtml: String,
+    val rutaBibliaJson: String
 )
 
 @Serializable
@@ -37,5 +51,6 @@ data class FilesConfig(
     val uriLibros: String,
     val uriTextos: String,
     val librosDto: String,
-    val textosDto: String
+    val textosDto: String,
+    val baseIndexDto: String
 )

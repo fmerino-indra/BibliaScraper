@@ -6,7 +6,6 @@ import org.fmm.biblia.scraper.data.dto.TipoTestamento
 @Serializable
 sealed interface Notable {
     val id: String
-//    val idHtml: String?
     val llamadasNotas: List<NotaAlPie>
 }
 
@@ -37,7 +36,7 @@ data class TextoPlano(
 data class NotaAlPie(
     val idHtml: String,
     val href: String,
-    val capitulo: Int,
+//    val capitulo: Int,
     val texto: String = "" // Pendiente de definir
     // Las notas al pie van a tener párrafos y citas entre sus frases.
 ):IElementoVersiculo
@@ -59,14 +58,6 @@ data class Titulo(
 ) : Notable, Paralelizable, IElementoVersiculo
 
 @Serializable
-data class Parrafo(
-    override val id: String,
-//    override val idHtml: String? = null,
-    override val llamadasNotas: List<NotaAlPie> = emptyList(),
-    val texto: String // Pendiente de definir
-) : Notable
-
-@Serializable
 data class Versiculo(
     override val id: String,
 //    override val idHtml: String? = null,
@@ -81,7 +72,6 @@ data class Versiculo(
 
     constructor(
         id: String,
-//        idHtml: String? = null,
         capitulo: Int,
         numero: String,
         esPoesia: Boolean = false,                         // Complemento: indicador de formato poético
@@ -91,7 +81,6 @@ data class Versiculo(
         elemento:IElementoVersiculo
     ) : this(
         id = id,
-//        idHtml = idHtml,
         llamadasNotas = llamadasNotas,
         titulosPrevios = titulosPrevios,
         paralelos = paralelos,
@@ -103,7 +92,6 @@ data class Versiculo(
 
     constructor(
         id: String,
-//        idHtml: String? = null,
         capitulo: Int,
         numero: String,
         esPoesia: Boolean = false,                         // Complemento: indicador de formato poético
@@ -113,7 +101,6 @@ data class Versiculo(
         textoString: String
     ) : this(
         id = id,
-//        idHtml = idHtml,
         llamadasNotas = llamadasNotas,
         titulosPrevios = titulosPrevios,
         paralelos = paralelos,
@@ -138,25 +125,27 @@ data class Capitulo(
 ) : Titulable
 
 @Serializable
+data class Parrafo(
+    override val id: String,
+    override val titulosPrevios: List<Titulo>,
+    override val llamadasNotas: List<NotaAlPie> = emptyList(),
+//    val texto: String // Pendiente de definir
+    val contenido: MutableList<IElementoVersiculo> = mutableListOf()
+) : Titulable, Notable
+
+@Serializable
 data class SeccionIntroduccion(
     override val id: String,
-//    override val idHtml: String? = null,
     override val titulosPrevios: List<Titulo> = emptyList(),
     val parrafos: List<Parrafo> = emptyList(),
     override val llamadasNotas: List<NotaAlPie> = mutableListOf(),
 ) : Titulable
 
-fun MutableList<NotaAlPie>.registrarNota(idHtml: String, href: String, capitulo: Int):NotaAlPie? {
-    return NotaAlPie(idHtml, href, capitulo)
+//fun MutableList<NotaAlPie>.registrarNota(idHtml: String, href: String, capitulo: Int):NotaAlPie? {
+fun MutableList<NotaAlPie>.registrarNota(idHtml: String, href: String):NotaAlPie? {
+    return NotaAlPie(idHtml, href)
         .takeIf { href.isNotBlank() }
         ?.also { add(it) }
-/*
-    if (href.isNotBlank()) {
-        val nota = NotaAlPie(idHtml = idHtml, href = href, capitulo = capitulo)
-        add(nota)
-        return nota
-    }
- */
 }
 
 fun MutableList<NotaAlPie>.vincularA(notable: Notable) {
@@ -225,8 +214,6 @@ enum class CategoriaDocumento { LIBRO, INTRODUCCION }
 @Serializable
 data class DocumentoBiblico(
     val id:Int,
-//    val id: String,
-//    val idHtml: String? = null,
     val key: String,
     val titulo: String,
     val abreviatura: String? = null,                       // Complemento: abreviatura del libro/documento
@@ -237,6 +224,18 @@ data class DocumentoBiblico(
     val seccionesIntroduccion: List<SeccionIntroduccion> = emptyList(),
     val capitulosEsperados: Int,
     val capitulosLibro: Map<Int,Capitulo> = emptyMap()
+)
+
+@Serializable
+data class TextoBiblico(
+    val id:Int,
+    val titulo: String,
+    val categoria: CategoriaDocumento,
+    val testamento: TipoTestamento = TipoTestamento.OTRO,
+    val orden: Int,
+    val urlOrigen: String,
+    val seccionIntroduccion: SeccionIntroduccion
+//    val seccionesIntroduccion: List<SeccionIntroduccion> = emptyList(),
 )
 /*
 class ContextoParseo {
